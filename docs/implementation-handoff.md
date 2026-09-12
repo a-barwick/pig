@@ -2,12 +2,24 @@
 
 Build Austin's everyday local pi GUI. The first release should let him work in a real project conversation, inspect the harness behind it, edit a skill, and try that revision. Stop there and dogfood.
 
+## Execute as one continuous build
+
+One lead owns the whole release, from bootstrap through integration and real verification. The tracks below divide ownership; they are not separate approval gates or stopping points. Establish the browser/server interfaces, complete the runtime/UI/workbench tracks, integrate them, fix failures, and deliver the running app in the same implementation effort.
+
+Use the documented stack and scope as the starting decisions. Resolve routine implementation details without sending them back to Austin. Raise a blocker only when missing access, a consequential action, or a material scope/architecture change needs his input. Keep working on independent tasks while a blocker is pending. Do not finish at a scaffold, a set of unintegrated branches, or a fixture-driven demo.
+
+**Implementation entry prompt:**
+
+> Implement the complete first release in docs/implementation-handoff.md, end to end. Use Svelte, TypeScript, a local Node server, tRPC/SSE, and the pi SDK. Follow design/pi-personal-workspace.html for the conversation/inspector and skill-workbench experience. Own bootstrap, all implementation tracks, integration, targeted tests, and a real pi smoke run. Make tool definitions and actual calls inspectable. Preserve my existing settings and credentials. Resolve routine choices yourself, report material blockers clearly, and continue until the app launches locally and the completion checks pass, or identify the exact external blocker. Commit the result, give me the launch command and URL, and stop for me to dogfood. Do not add the deferred features.
+
+The SDK/package compatibility check and actual browser/provider smoke checks happen during this build. They are still unverified; readiness of this plan is not evidence that those checks already pass.
+
 ## Direction and scope
 
 - **Platform:** local browser app, one user, one local process. No hosted service or desktop packaging.
 - **UI:** chat with a harness inspector; opening a skill shows its editor beside the conversation. One sidebar holds projects and customization. No separate Run/Customize modes or recipe builder.
 - **Reference:** `design/pi-personal-workspace.html`. Its messages, findings, files, and tool activity are examples. Never carry those into the real experience as apparent runtime output.
-- **First release:** project selection by local path, new/resumed conversations, streamed text/thinking/tool activity, available-tool inspection, stop/steer, model/thinking selection, resource provenance, skill editing, and scoped model/thinking defaults.
+- **First release:** project selection by local path, new/resumed conversations, streamed text/thinking/tool activity, available-tool inspection, stop/steer, model/thinking selection, resource provenance, skill creation/editing, and scoped model/thinking defaults.
 - **Defer:** multiple simultaneous agents, full IDE/file explorer, embedded terminal, attachments, session branching, general evals, package installation UI, themes/keybinding editors, and forms for all 65 settings. Keep the fuller sidebar as the intended organization; hide unavailable actions or label read-only sections clearly.
 - **Personal first:** reuse Austin's installed pi configuration/auth on the server. Start authoring with a project-local skill and project overrides; global edits are deliberate UI choices. Never copy auth or sessions into this repo.
 
@@ -27,7 +39,7 @@ RPC describes calling remote functions; HTTP, SSE, and WebSocket describe how re
 | Local Node server → browser updates | tRPC subscription over Server-Sent Events (SSE) | One ordered feed for response text, tool activity, and session state; no polling. Stop/steer travel as separate RPC calls |
 | Local Node server → pi | Direct coding-agent SDK calls in the same process | Immediate access to sessions, tools, resources, and settings without another serialization layer |
 
-This is the proposed transport default for bootstrap to validate, not an implemented integration. Use the vanilla tRPC client from Svelte; no React dependency or React query hooks. Input validation is still required even when TypeScript types agree.
+Use this transport default and validate it during bootstrap; it is not yet an implemented integration. Use the vanilla tRPC client from Svelte; no React dependency or React query hooks. Input validation is still required even when TypeScript types agree.
 
 **Alternatives worth distinguishing:** WebSocket supports bidirectional messages over a persistent connection and could fit future terminal/audio interaction. It is not needed solely to stream text and send cancellation commands. Pi's own `--mode rpc` instead uses JSON lines over a child process's stdin/stdout; it is useful if we want a separately managed pi process or need the installed CLI as the runtime. That is a server-to-pi decision, independent of browser transport. If the SDK proves unsuitable, report the concrete reason before switching this boundary.
 
@@ -81,7 +93,7 @@ Do not import Node-only pi SDK modules into the browser. Do not invent a generic
 ## Completion checks that matter
 
 1. Open a real project, use an existing configured model, and see actual streamed text and tool output. Stop a running turn, send a steering message, and resume the saved conversation after server restart. Loading history must not rerun tools.
-2. Edit a project skill, review its diff, save it, and invoke that saved revision in a fresh conversation. Show evidence of the invocation/loading without claiming the model obeyed every instruction.
+2. Create a project skill with a name, description, and instructions; save it as a real `SKILL.md`. Edit it, review the diff, save, and invoke that saved revision in a fresh conversation. Show evidence of the invocation/loading without claiming the model obeyed every instruction.
 3. **A project setting can differ from your usual default without changing it.** Start with a global thinking default of High and no per-model override for the selected model. Set this project to Medium. The UI must show Medium for this project while the global file still says High. Choose “Use my default”; the project entry is removed and the UI shows High again. Verify in a fresh session so a running session's temporary choice does not obscure the result.
 4. **Show when pi has not loaded a project's skills or extensions, and why.** Open a test project with no saved trust decision, using pi's `ask` fallback. The GUI must say its project-local skills/extensions are not loaded and show the reason, rather than marking them active. If Austin explicitly chooses to trust that folder, reload or start a fresh session as required and verify the resources are now loaded. Do not grant trust automatically or change his trust policy for other projects. Do not describe this as denying all project file access.
 5. Check the actual browser UI at desktop and half-window widths, including streaming, error, empty, disconnected, unsaved-draft, and pending-dialog states. The current mockup has only static validation; visual verification is outstanding.
@@ -92,7 +104,7 @@ Use targeted tests for config preservation/conflicts, session event ordering/can
 
 ## Copy/paste thread prompts
 
-Give each thread the same repository/worktree location and `docs/implementation-handoff.md`. These prompts assign implementation only when Austin dispatches them; no agents were launched while preparing this plan.
+The implementation entry prompt above is sufficient for one lead to build everything. The prompts below are optional assignments when work is split among threads. Give each thread the same repository/worktree location and `docs/implementation-handoff.md`; the lead remains responsible for integration and does not stop after handing off the bootstrap. No agents were launched while preparing this plan.
 
 ### Thread 0 — Lead / bootstrap
 
@@ -108,7 +120,7 @@ Give each thread the same repository/worktree location and `docs/implementation-
 
 ### Thread 3 — Harness workbench
 
-> Implement the harness track in docs/implementation-handoff.md. Own src/server/config/, src/client/features/workbench/, and focused tests. Deliver skill discovery/edit/diff/save and scoped model/thinking defaults with source provenance, conflict detection, unknown-field preservation, and undo last save. Wire a known skill revision into the runtime's fresh-session flow. Do not expose secrets or build a package marketplace. Return commits and real round-trip evidence.
+> Implement the harness track in docs/implementation-handoff.md. Own src/server/config/, src/client/features/workbench/, and focused tests. Deliver skill discovery/create/edit/diff/save and scoped model/thinking defaults with source provenance, conflict detection, unknown-field preservation, and undo last save. Wire a known skill revision into the runtime's fresh-session flow. Do not expose secrets or build a package marketplace. Return commits and real round-trip evidence.
 
 ### Thread 4 — Integration / dogfood
 

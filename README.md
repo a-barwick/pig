@@ -8,7 +8,7 @@ Frontend: Svelte. Tool definitions, actual calls, arguments, and results should 
 
 ## Start here
 
-- **[Implementation handoff and thread prompts](docs/implementation-handoff.md)** — the single source for scope, implementation defaults, ownership, and completion checks.
+- **[Implementation handoff](docs/implementation-handoff.md)** — start with its single implementation entry prompt. It covers the complete build, ownership, and completion checks; separate thread prompts are optional.
 - **Current mockup:** `design/pi-personal-workspace.html`. Open Skills or “Edit the review skill” to move from conversation to the workbench. Sidebar navigation, draft review, tool details, and trial previews are interactive.
 
 ## Reference material
