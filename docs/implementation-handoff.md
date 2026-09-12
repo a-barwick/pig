@@ -5,7 +5,7 @@ Build Austin's everyday local pi GUI. The first release should let him work in a
 ## Direction and scope
 
 - **Platform:** local browser app, one user, one local process. No hosted service or desktop packaging.
-- **Working UI direction:** concept B (chat + inspector), opening concept C's editor/conversation layout for customization. This is our interpretation of Austin's positive review, not a mandate to reproduce every pixel.
+- **UI:** chat with a harness inspector; opening a skill shows its editor beside the conversation. One sidebar holds projects and customization. No separate Run/Customize modes or recipe builder.
 - **Reference:** `design/pi-personal-workspace.html`. Its messages, findings, files, and tool activity are examples. Never carry those into the real experience as apparent runtime output.
 - **First release:** project selection by local path, new/resumed conversations, streamed text/thinking/tool activity, stop/steer, model/thinking selection, resource provenance, skill editing, and scoped model/thinking defaults.
 - **Defer:** multiple simultaneous agents, full IDE/file explorer, embedded terminal, attachments, session branching, general evals, package installation UI, themes/keybinding editors, and forms for all 65 settings. Keep the fuller sidebar as the intended organization; hide unavailable actions or label read-only sections clearly.
@@ -25,7 +25,7 @@ The server can write local files and run pi tools: bind loopback, validate Host/
 | --- | --- | --- | --- |
 | **0 — Lead / bootstrap** | Root tooling, dependencies, `src/shared/`, server composition, integration | Nothing | App starts locally, SDK import/session creation works, shared contract is written, ownership is assigned |
 | **1 — Pi runtime** | `src/server/runtime/`, session commands/events, runtime tests | 0 | One real conversation streams; cancel, steer, and resume work; failures reach the UI contract |
-| **2 — App experience** | Client shell, conversation, inspector, API client; excludes workbench feature files | 0 | B/C layout works against the shared contract; real runtime replaces isolated development fixtures |
+| **2 — App experience** | Client shell, conversation, inspector, API client; excludes workbench feature files | 0 | Conversation and workbench layouts work against the shared contract; real runtime replaces isolated development fixtures |
 | **3 — Harness workbench** | `src/server/config/`, `src/client/features/workbench/`, config/skill tests | 0 | One skill and scoped defaults round-trip without unrelated changes; revision can be used in a fresh session |
 | **4 — Integration / dogfood** | Lead integrates 1–3; scoped fixes assigned back to owners | 1–3 | Verified real edit → run → inspect loop, launch instructions, limitations, clean commits |
 
@@ -50,7 +50,7 @@ Do not import Node-only pi SDK modules into the browser. Do not invent a generic
 2. Edit a project skill, review its diff, save it, and invoke that saved revision in a fresh conversation. Show evidence of the invocation/loading without claiming the model obeyed every instruction.
 3. Change a project thinking/model default, then remove the override and see inheritance return. Preserve unknown JSON/frontmatter and unrelated nested keys; detect concurrent file edits before overwriting. A save, undo, or reload failure remains visible and does not erase the user's draft.
 4. Report untrusted/ignored project resources honestly. Do not silently trust everything to pass the trial. Inherited global resources and credentials stay intact.
-5. Check the actual browser UI at desktop and half-window widths, including streaming, error, empty, disconnected, unsaved-draft, and pending-dialog states. Previous mockups passed syntax checks but browser automation timed out; visual verification is outstanding.
+5. Check the actual browser UI at desktop and half-window widths, including streaming, error, empty, disconnected, unsaved-draft, and pending-dialog states. The current mockup has only static validation; visual verification is outstanding.
 
 Use targeted tests for config preservation/conflicts, session event ordering/cancel/resume, and local server access boundaries. Keep fake responses in explicit tests or development stories. Verify the real end-to-end path separately; report if auth or provider access blocks it. A passing test suite is not a completed dogfood run.
 
@@ -60,7 +60,7 @@ Give each thread the same repository/worktree location and `docs/implementation-
 
 ### Thread 0 — Lead / bootstrap
 
-> Implement the bootstrap in docs/implementation-handoff.md for Austin's personal pi GUI. Establish the small client/server app, verify the installed pi SDK, commit the shared contract, and assign paths before parallel work. Own dependencies and integration. Use B as the everyday layout and C for editing. Keep the first slice to a real conversation plus skill customization; avoid productization. Hand off a working base commit, contract, and exact commands to threads 1–3.
+> Implement the bootstrap in docs/implementation-handoff.md for Austin's personal pi GUI. Establish the small client/server app, verify the installed pi SDK, commit the shared contract, and assign paths before parallel work. Own dependencies and integration. Use chat with an inspector and a side-by-side workbench when editing. Keep the first slice to a real conversation plus skill customization; avoid productization. Hand off a working base commit, contract, and exact commands to threads 1–3.
 
 ### Thread 1 — Pi runtime
 
@@ -68,7 +68,7 @@ Give each thread the same repository/worktree location and `docs/implementation-
 
 ### Thread 2 — App experience
 
-> Implement the client experience in docs/implementation-handoff.md against the agreed contract. Use design/pi-personal-workspace.html as B/C layout reference, not as production code or runtime data. Own shell, conversation, inspector, and client transport; coordinate the workbench mount with thread 3. Make real streaming/tool/error states usable at desktop and half-window widths. Keep fixtures isolated and report visual checks and integration gaps.
+> Implement the client experience in docs/implementation-handoff.md against the agreed contract. Use design/pi-personal-workspace.html as the layout reference, not as production code or runtime data. Own shell, conversation, inspector, and client transport; coordinate the workbench mount with thread 3. Make real streaming/tool/error states usable at desktop and half-window widths. Keep fixtures isolated and report visual checks and integration gaps.
 
 ### Thread 3 — Harness workbench
 
@@ -80,7 +80,7 @@ Give each thread the same repository/worktree location and `docs/implementation-
 
 ## Herdr dispatch notes
 
-Herdr skill installed at `/Users/austinbarwick/.agents/skills/herdr/SKILL.md`; CLI 0.9.0 and `HERDR_ENV=1` verified in this planning session. Re-check caller context and current CLI help at dispatch time; do not assume pane IDs or server state from this note.
+Read the installed Herdr skill at `/Users/austinbarwick/.agents/skills/herdr/SKILL.md` when dispatching through Herdr. Verify caller context and current CLI help at dispatch time; never assume pane IDs or server state from this document.
 
 No Herdr topology or agents have been created. A dispatching thread should read the skill, preserve user focus, use discovered IDs, and start only the assigned tracks. Worktrees/tabs are optional coordination choices requiring the requested topology; the installed skill defaults to sibling panes in the current directory. An agent reporting done is a handoff signal, not integration or acceptance evidence.
 

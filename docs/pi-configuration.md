@@ -2,6 +2,8 @@
 
 Baseline: installed `@earendil-works/pi-coding-agent` **0.85.1**, inspected September 12, 2026. The installed package's docs are the version-specific reference; links below point to current upstream and can change.
 
+This is a capability reference. The [implementation handoff](implementation-handoff.md) defines which capabilities belong in the first release.
+
 ## Current local starting point
 
 Pi is installed through Node 22.23.2. Selected non-secret defaults are `openai-codex` / `gpt-5.6-sol`, thinking `high`, theme `dark`. The settings file also contains a per-model thinking map and changelog bookkeeping. A global skills directory exists. This was a narrow read of configuration metadata, not a skills audit. Credentials and session contents were not read or copied.
@@ -29,7 +31,7 @@ Pi is installed through Node 22.23.2. Selected non-secret defaults are `openai-c
 
 Sources: [settings](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md), [skills](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md), [prompts](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/prompt-templates.md), [README/context](https://github.com/earendil-works/pi/tree/main/packages/coding-agent), [packages](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/packages.md).
 
-## Settings families to expose
+## Settings families
 
 | Family | Principal controls | Suggested placement |
 | --- | --- | --- |
@@ -97,7 +99,6 @@ Provider credential/cloud environment variables are provider-specific; use the [
 
 ## What is not a stock pi setting
 
-- Named harness recipes/profiles in our UI: dashboard-defined file compositions or separate agent directories.
 - MCP servers: require an extension/integration; no universal native `mcpServers` config promised.
 - Subagent roles, workflow chains, LSP, memory automation: extension-owned or custom harness behavior.
 - Filesystem/network permissions and per-action approval: no built-in permission policy to configure. Tool allowlists and project trust are not OS isolation.

@@ -2,7 +2,7 @@
 
 65 documented settings-table fields in pi 0.85.1, checked September 12, 2026. Names, types, and defaults are transcribed from the installed package documentation; unset defaults are shown as `-`. This is a research snapshot, not a validation schema.
 
-Read [configuration inventory](pi-configuration.md) for meanings, scopes, caveats, non-settings files, and proposed UI grouping. Upstream: [versioned settings documentation](https://github.com/earendil-works/pi/blob/v0.85.1/packages/coding-agent/docs/settings.md). The local installed docs were used directly; the versioned raw source URL was also verified to return successfully.
+Read [configuration inventory](pi-configuration.md) for meanings, scopes, caveats, and non-settings files. Upstream: [versioned settings documentation](https://github.com/earendil-works/pi/blob/v0.85.1/packages/coding-agent/docs/settings.md). The local installed docs were used directly; the versioned raw source URL was also verified to return successfully.
 
 ## Model & Thinking
 

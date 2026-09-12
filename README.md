@@ -1,23 +1,29 @@
 # Pi Dashboard
 
-A personal GUI for shaping Austin's pi harness: author skills, understand configuration, and try changes against a real agent.
+A local browser GUI for Austin's everyday pi conversations and harness customization. Chat with an inspector is the default; opening a skill brings up its editor beside the conversation.
 
-**Stage: implementation handoff ready.** This repository contains research, scope, interactive UI concepts, and bounded prompts for implementation threads. No application runtime or live pi configuration changes have been implemented.
+**Stage: implementation handoff ready.** The repository contains the current plan, one interactive mockup, and pi reference material. No application runtime or live pi configuration changes have been implemented.
 
-## Review
+## Start here
 
-- **[Implementation handoff and thread prompts](docs/implementation-handoff.md)** — start here for new implementation threads.
-- [Personal GUI concepts — latest round](docs/personal-gui-directions.md): three ways to combine chat and the workbench, for Austin's use first.
-- [Product plan and implementation options](docs/product-plan.md)
+- **[Implementation handoff and thread prompts](docs/implementation-handoff.md)** — the single source for scope, implementation defaults, ownership, and completion checks.
+- **Current mockup:** `design/pi-personal-workspace.html`. Open Skills or “Edit the review skill” to move from conversation to the workbench. Sidebar navigation, draft review, tool details, and trial previews are interactive.
+
+## Reference material
+
+These describe pi's capabilities and ecosystem, not additional implementation requirements.
+
 - [Pi configuration inventory](docs/pi-configuration.md)
 - [Complete installed settings reference](docs/settings-reference.md)
 - [Community setups and UI precedents](docs/community-setups.md)
-- [UI directions and review questions](docs/ui-directions.md)
-- [Interactive concept source](design/pi-harness-concepts.html)
-- [Review status and validation limits](docs/review-status.md)
+- Machine-readable settings snapshot: `research/settings-0.85.1.json`.
 
 Research baseline: locally installed `@earendil-works/pi-coding-agent` **0.85.1**, checked September 12, 2026. Older articles often refer to `@mariozechner/pi-coding-agent` and `badlogic/pi-mono`; the current upstream is [earendil-works/pi](https://github.com/earendil-works/pi).
 
-The concepts use illustrative skill content and local-only interactions. They do not read or write pi settings, install extensions, call a model, or report real test results. The future first slice is described in the plan; selecting a concept is not implementation approval.
+## Validation status
+
+The mockup uses illustrative messages, files, skill content, and local-only interactions. It does not read or write pi settings, install extensions, or call a model. Drafts reset when navigating between screens.
+
+JavaScript syntax, static element references, and documentation links are checked. Browser automation could not connect during preview checks, so rendered layout and live click behavior remain unverified. Implementation and real-provider dogfooding have not started.
 
 Local Git repository only. No GitHub remote or deployment has been created.
