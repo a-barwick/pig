@@ -1,8 +1,8 @@
-export type Thinking = 'off' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh';
+export type Thinking = 'off' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh' | 'max';
 export type Scope = 'project' | 'global';
 export interface ModelInfo { id: string; provider: string; name: string; }
-export interface ToolDefinition { name: string; description: string; parameters: unknown; active: boolean; source: string; path?: string; }
-export interface ToolCall { id: string; name: string; args: unknown; result?: unknown; status: 'running'|'completed'|'failed'|'cancelled'; startedAt: number; endedAt?: number; outputNote?: string; }
+export interface ToolDefinition { name: string; description: string; parameters?: unknown; active: boolean; source: string; path?: string; }
+export interface ToolCall { id: string; name: string; args?: unknown; result?: unknown; status: 'running'|'completed'|'failed'|'cancelled'|'unknown'; startedAt: number; endedAt?: number; outputNote?: string; }
 export interface Message { id: string; role: 'user'|'assistant'|'toolResult'|'system'; text: string; thinking?: string; toolCalls?: ToolCall[]; error?: string; }
 export interface Resource { kind: 'skill'|'extension'|'instruction'|'prompt'; name: string; path: string; loaded: boolean; source: string; reason?: string; }
 export interface Dialog { id: string; kind: 'select'|'confirm'|'input'|'editor'|'unsupported'; title: string; message?: string; options?: string[]; initialValue?: string; }
@@ -12,7 +12,7 @@ export interface SessionInfo { id: string; path: string; name: string; updatedAt
 export interface Accepted { accepted: true; sessionId: string; requestId: string; }
 export interface SkillFile { resourceId: string; name: string; description: string; path: string; scope: Scope; content: string; revision: string; }
 export type SaveResult = { ok: true; revision: string; path: string; applied: false } | { ok: false; conflict: boolean; message: string; currentRevision?: string };
-export interface SettingsView { scope: Scope; path: string; revision: string; model?: ModelInfo; thinking?: Thinking; effectiveModel?: ModelInfo; effectiveThinking: Thinking; source: string; }
+export interface SettingsView { defaultProvider?: string; defaultModel?: string; scope: Scope; path: string; revision: string; model?: ModelInfo; thinking?: Thinking; effectiveModel?: ModelInfo; effectiveThinking: Thinking; source: string; modelThinkingLevels?: Record<string, Thinking>; effectiveModelThinkingLevels?: Record<string, Thinking>; }
 export interface RuntimeService {
  open(input: {projectPath: string; sessionPath?: string}): Promise<Snapshot>;
  snapshot(): Snapshot | null;
@@ -33,5 +33,5 @@ export interface ConfigService {
  saveSkill(input: {projectPath: string; resourceId?: string; name: string; scope: Scope; expectedRevision: string | null; content: string}): Promise<SaveResult>;
  undo(input: {projectPath: string; path: string; expectedRevision: string}): Promise<SaveResult>;
  settings(input: {projectPath: string; scope: Scope}): Promise<SettingsView>;
- saveSettings(input: {projectPath: string; scope: Scope; expectedRevision: string; model?: {provider: string; id: string} | null; thinking?: Thinking | null}): Promise<SaveResult>;
+ saveSettings(input: {projectPath: string; scope: Scope; expectedRevision: string; model?: {provider: string; id: string} | null; thinking?: Thinking | null; modelThinking?: {provider: string; id: string; level: Thinking | null}}): Promise<SaveResult>;
 }

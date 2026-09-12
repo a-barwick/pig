@@ -37,6 +37,6 @@ export async function serve(runtime: RuntimeService, config: ConfigService, port
   res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml'} as Record<string,string>)[extname(file)]??'application/octet-stream');
   createReadStream(file).on('error',()=>{res.statusCode=404;res.end();}).pipe(res);
  });
- await new Promise<void>(r=>server.listen(port,'127.0.0.1',r));
+ await new Promise<void>((r,e)=>{server.once('error',e);server.listen(port,'127.0.0.1',()=>{server.off('error',e);r();});});
  return {server,origin,close:async()=>{await runtime.dispose();await vite?.close();await new Promise<void>((r,e)=>server.close(err=>err?e(err):r()));}};
 }

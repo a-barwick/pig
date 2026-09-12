@@ -4,7 +4,7 @@ This is Austin's personal project. Prioritize a useful end-to-end loop and avoid
 
 Austin explicitly confirmed this is for his own use first. Current design direction combines everyday pi conversations with a customization workbench in a local browser app. Do not expand scope for teams, broad onboarding, a marketplace, or general-purpose productization.
 
-Current stage: implementation handoff prepared. `docs/implementation-handoff.md` is the single source for the bounded first slice and thread ownership. A thread explicitly assigned an implementation track may execute that track. Configuration and community reference documents describe capabilities, not additional scope.
+Current stage: first slice implemented for local dogfooding. `docs/implementation-handoff.md` defines the bounded scope; `docs/acceptance.md` records verification. Configuration and community reference documents describe capabilities, not additional scope.
 
 - Plans in this repo are proposals, not automatically adopted requirements.
 - Use Svelte for the frontend. Do not substitute React unless Austin explicitly requests it.

@@ -12,7 +12,7 @@ Use the documented stack and scope as the starting decisions. Resolve routine im
 
 > Implement the complete first release in docs/implementation-handoff.md, end to end. Use Svelte, TypeScript, a local Node server, tRPC/SSE, and the pi SDK. Follow design/pi-personal-workspace.html for the conversation/inspector and skill-workbench experience. Own bootstrap, all implementation tracks, integration, targeted tests, and a real pi smoke run. Make tool definitions and actual calls inspectable. Preserve my existing settings and credentials. Resolve routine choices yourself, report material blockers clearly, and continue until the app launches locally and the completion checks pass, or identify the exact external blocker. Commit the result, give me the launch command and URL, and stop for me to dogfood. Do not add the deferred features.
 
-The SDK/package compatibility check and actual browser/provider smoke checks happen during this build. They are still unverified; readiness of this plan is not evidence that those checks already pass.
+Implementation and acceptance evidence are recorded in [acceptance.md](acceptance.md). The release uses the pinned installed SDK 0.85.1; live provider and browser checks are separate from unit tests.
 
 ## Direction and scope
 
@@ -39,7 +39,7 @@ RPC describes calling remote functions; HTTP, SSE, and WebSocket describe how re
 | Local Node server → browser updates | tRPC subscription over Server-Sent Events (SSE) | One ordered feed for response text, tool activity, and session state; no polling. Stop/steer travel as separate RPC calls |
 | Local Node server → pi | Direct coding-agent SDK calls in the same process | Immediate access to sessions, tools, resources, and settings without another serialization layer |
 
-Use this transport default and validate it during bootstrap; it is not yet an implemented integration. Use the vanilla tRPC client from Svelte; no React dependency or React query hooks. Input validation is still required even when TypeScript types agree.
+The implementation uses this transport; its HTTP/SSE access and delivery checks are recorded in acceptance.md. Use the vanilla tRPC client from Svelte; no React dependency or React query hooks. Input validation is still required even when TypeScript types agree.
 
 **Alternatives worth distinguishing:** WebSocket supports bidirectional messages over a persistent connection and could fit future terminal/audio interaction. It is not needed solely to stream text and send cancellation commands. Pi's own `--mode rpc` instead uses JSON lines over a child process's stdin/stdout; it is useful if we want a separately managed pi process or need the installed CLI as the runtime. That is a server-to-pi decision, independent of browser transport. If the SDK proves unsuitable, report the concrete reason before switching this boundary.
 
@@ -104,7 +104,7 @@ Use targeted tests for config preservation/conflicts, session event ordering/can
 
 ## Copy/paste thread prompts
 
-The implementation entry prompt above is sufficient for one lead to build everything. The prompts below are optional assignments when work is split among threads. Give each thread the same repository/worktree location and `docs/implementation-handoff.md`; the lead remains responsible for integration and does not stop after handing off the bootstrap. No agents were launched while preparing this plan.
+The implementation entry prompt above is sufficient for one lead to build everything. The prompts below are optional assignments when work is split among threads. Give each thread the same repository/worktree location and `docs/implementation-handoff.md`; the lead remains responsible for integration and does not stop after handing off the bootstrap. The integrated build used the visible Herdr tracks pi-runtime, pi-ui, and pi-workbench.
 
 ### Thread 0 — Lead / bootstrap
 
@@ -130,7 +130,7 @@ The implementation entry prompt above is sufficient for one lead to build everyt
 
 Read the installed Herdr skill at `/Users/austinbarwick/.agents/skills/herdr/SKILL.md` when dispatching through Herdr. Verify caller context and current CLI help at dispatch time; never assume pane IDs or server state from this document.
 
-No Herdr topology or agents have been created. A dispatching thread should read the skill, preserve user focus, use discovered IDs, and start only the assigned tracks. Worktrees/tabs are optional coordination choices requiring the requested topology; the installed skill defaults to sibling panes in the current directory. An agent reporting done is a handoff signal, not integration or acceptance evidence.
+Future dispatching threads should read the skill, preserve user focus, use discovered IDs, and start only the assigned tracks. Worktrees/tabs are optional coordination choices requiring the requested topology; the installed skill defaults to sibling panes in the current directory. An agent reporting done is a handoff signal, not integration or acceptance evidence.
 
 ## References
 

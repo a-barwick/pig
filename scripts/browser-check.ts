@@ -1,0 +1,14 @@
+import { chromium } from '@playwright/test';
+import { mkdir } from 'node:fs/promises';
+const out='/tmp/pi-dashboard-browser';await mkdir(out,{recursive:true});
+const browser=await chromium.launch({channel:'chrome',headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1000}});
+const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://127.0.0.1:4317');
+await page.waitForTimeout(1500);
+await page.screenshot({path:out+'/desktop.png',fullPage:true});
+console.log(JSON.stringify({errors,text:(await page.locator('body').innerText()).slice(0,6500)}));
+await page.setViewportSize({width:760,height:900});
+await page.screenshot({path:out+'/half.png',fullPage:true});
+console.log(JSON.stringify({width:760,scrollWidth:await page.evaluate(()=>document.documentElement.scrollWidth)}));
+await browser.close();

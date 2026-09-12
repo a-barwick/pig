@@ -5,7 +5,7 @@ const t = initTRPC.context<{ runtime: RuntimeService; config: ConfigService }>()
 const p = t.procedure;
 const projectPath = z.string().min(1);
 const scope = z.enum(['project','global']);
-const thinking = z.enum(['off','minimal','low','medium','high','xhigh']);
+const thinking = z.enum(['off','minimal','low','medium','high','xhigh','max']);
 const model = z.object({provider:z.string().min(1),id:z.string().min(1)});
 const command = z.object({sessionId:z.string(),requestId:z.string().min(1),text:z.string().min(1)});
 export const appRouter = t.router({
@@ -25,6 +25,6 @@ export const appRouter = t.router({
  saveSkill:p.input(z.object({projectPath,resourceId:z.string().optional(),name:z.string().min(1),scope,expectedRevision:z.string().nullable(),content:z.string()})).mutation(({ctx,input})=>ctx.config.saveSkill(input)),
  undo:p.input(z.object({projectPath,path:z.string(),expectedRevision:z.string()})).mutation(({ctx,input})=>ctx.config.undo(input)),
  settings:p.input(z.object({projectPath,scope})).query(({ctx,input})=>ctx.config.settings(input)),
- saveSettings:p.input(z.object({projectPath,scope,expectedRevision:z.string(),model:model.nullable().optional(),thinking:thinking.nullable().optional()})).mutation(({ctx,input})=>ctx.config.saveSettings(input)),
+ saveSettings:p.input(z.object({projectPath,scope,expectedRevision:z.string(),model:model.nullable().optional(),thinking:thinking.nullable().optional(),modelThinking:z.object({provider:z.string().min(1),id:z.string().min(1),level:thinking.nullable()}).optional()})).mutation(({ctx,input})=>ctx.config.saveSettings(input)),
 });
 export type AppRouter = typeof appRouter;
