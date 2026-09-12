@@ -17,3 +17,7 @@ No app runtime, model inference, extension installation, live pi settings mutati
 Austin chose the workbench direction, expanded the discussion toward an everyday pi GUI, and explicitly prioritized his personal use. Three new interactive layouts combine conversations and customization: Two spaces, Chat + inspector, and Integrated studio. See [personal GUI directions](personal-gui-directions.md).
 
 The new fragment passed JavaScript syntax, static ID-reference, duplicate-ID, and size checks. Browser automation timed out again while opening the preview, so rendered layout and live click behavior remain unverified. These are design previews; no runtime implementation started.
+
+## Implementation handoff
+
+Austin requested a plan for other threads to implement. `docs/implementation-handoff.md` now defines the personal B/C GUI slice, a bootstrap before three parallel tracks, ownership, copy/paste prompts, and integration/dogfood checks. No workers were started. Herdr skill availability, CLI 0.9.0, and `HERDR_ENV=1` were verified live; no session layout was inspected or changed.

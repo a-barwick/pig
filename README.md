@@ -2,10 +2,11 @@
 
 A personal GUI for shaping Austin's pi harness: author skills, understand configuration, and try changes against a real agent.
 
-**Stage: ideation.** This repository contains research, proposed scope, and interactive UI concepts. No application runtime or live pi configuration changes have been implemented.
+**Stage: implementation handoff ready.** This repository contains research, scope, interactive UI concepts, and bounded prompts for implementation threads. No application runtime or live pi configuration changes have been implemented.
 
 ## Review
 
+- **[Implementation handoff and thread prompts](docs/implementation-handoff.md)** — start here for new implementation threads.
 - [Personal GUI concepts — latest round](docs/personal-gui-directions.md): three ways to combine chat and the workbench, for Austin's use first.
 - [Product plan and implementation options](docs/product-plan.md)
 - [Pi configuration inventory](docs/pi-configuration.md)

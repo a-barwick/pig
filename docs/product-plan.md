@@ -1,6 +1,6 @@
 # Product proposal
 
-Status: for discussion, not an approved implementation specification.
+Status: historical exploration. Superseded for implementation scope by [the implementation handoff](implementation-handoff.md). The original alternatives below remain context, not additional requirements.
 
 **Latest direction:** Austin selected the workbench, then asked to explore it as his everyday personal pi GUI. The [second concept round](personal-gui-directions.md) combines project conversations with customization. Build for Austin first; general-purpose onboarding, team features, and productization are outside this proposal. The original slice below is a starting point to revise after choosing the combined layout.
 
