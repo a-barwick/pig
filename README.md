@@ -2,6 +2,8 @@
 
 A local browser GUI for Austin's everyday pi conversations and harness customization. Chat with an inspector is the default; opening a skill brings up its editor beside the conversation.
 
+Frontend: Svelte. Tool definitions, actual calls, arguments, and results should be inspectable; the UI follows pi's transparency and simplicity.
+
 **Stage: implementation handoff ready.** The repository contains the current plan, one interactive mockup, and pi reference material. No application runtime or live pi configuration changes have been implemented.
 
 ## Start here
@@ -17,6 +19,7 @@ These describe pi's capabilities and ecosystem, not additional implementation re
 - [Complete installed settings reference](docs/settings-reference.md)
 - [Community setups and UI precedents](docs/community-setups.md)
 - Machine-readable settings snapshot: `research/settings-0.85.1.json`.
+- [Deferred ideas](docs/future.md): skill evals, explicitly outside the current slice.
 
 Research baseline: locally installed `@earendil-works/pi-coding-agent` **0.85.1**, checked September 12, 2026. Older articles often refer to `@mariozechner/pi-coding-agent` and `badlogic/pi-mono`; the current upstream is [earendil-works/pi](https://github.com/earendil-works/pi).
 

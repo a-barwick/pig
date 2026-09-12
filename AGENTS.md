@@ -7,6 +7,8 @@ Austin explicitly confirmed this is for his own use first. Current design direct
 Current stage: implementation handoff prepared. `docs/implementation-handoff.md` is the single source for the bounded first slice and thread ownership. A thread explicitly assigned an implementation track may execute that track. Configuration and community reference documents describe capabilities, not additional scope.
 
 - Plans in this repo are proposals, not automatically adopted requirements.
+- Use Svelte for the frontend. Do not substitute React unless Austin explicitly requests it.
+- Mirror pi's transparency and simplicity: make available tools, actual calls, arguments, results, and configuration sources inspectable.
 - Verify pi behavior against the installed version; current research baseline is 0.85.1 under `@earendil-works`.
 - Keep pi configuration files as the source of truth. Distinguish pi-native settings, extension-owned configuration, and dashboard-only preferences.
 - Preserve existing settings and unrelated files. Never commit credentials, session contents, or copies of Austin's global config.
