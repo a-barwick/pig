@@ -1,0 +1,399 @@
+{
+  "package": "@earendil-works/pi-coding-agent",
+  "version": "0.85.1",
+  "checked": "2026-09-12",
+  "source": "https://github.com/earendil-works/pi/blob/v0.85.1/packages/coding-agent/docs/settings.md",
+  "scope": "All documented settings-table fields; excludes private bookkeeping and open-ended extension config",
+  "settings": [
+    {
+      "group": "Model & Thinking",
+      "key": "defaultProvider",
+      "type": "string",
+      "default": "-"
+    },
+    {
+      "group": "Model & Thinking",
+      "key": "defaultModel",
+      "type": "string",
+      "default": "-"
+    },
+    {
+      "group": "Model & Thinking",
+      "key": "defaultThinkingLevel",
+      "type": "string",
+      "default": "-"
+    },
+    {
+      "group": "Model & Thinking",
+      "key": "modelThinkingLevels",
+      "type": "object",
+      "default": "-"
+    },
+    {
+      "group": "Model & Thinking",
+      "key": "hideThinkingBlock",
+      "type": "boolean",
+      "default": "`false`"
+    },
+    {
+      "group": "Model & Thinking",
+      "key": "showCacheMissNotices",
+      "type": "boolean",
+      "default": "`false`"
+    },
+    {
+      "group": "Model & Thinking",
+      "key": "thinkingBudgets",
+      "type": "object",
+      "default": "-"
+    },
+    {
+      "group": "UI & Display",
+      "key": "theme",
+      "type": "string",
+      "default": "`\"dark\"`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "externalEditor",
+      "type": "string",
+      "default": "`$VISUAL`, then `$EDITOR`, then Notepad on Windows or `nano` elsewhere"
+    },
+    {
+      "group": "UI & Display",
+      "key": "quietStartup",
+      "type": "boolean",
+      "default": "`false`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "defaultProjectTrust",
+      "type": "string",
+      "default": "`\"ask\"`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "collapseChangelog",
+      "type": "boolean",
+      "default": "`false`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "enableInstallTelemetry",
+      "type": "boolean",
+      "default": "`true`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "enableAnalytics",
+      "type": "boolean",
+      "default": "`false`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "trackingId",
+      "type": "string",
+      "default": "-"
+    },
+    {
+      "group": "UI & Display",
+      "key": "doubleEscapeAction",
+      "type": "string",
+      "default": "`\"tree\"`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "treeFilterMode",
+      "type": "string",
+      "default": "`\"default\"`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "editorPaddingX",
+      "type": "number",
+      "default": "`0`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "outputPad",
+      "type": "number",
+      "default": "`1`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "autocompleteMaxVisible",
+      "type": "number",
+      "default": "`5`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "showHardwareCursor",
+      "type": "boolean",
+      "default": "`false`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "tuiMode",
+      "type": "string",
+      "default": "`\"regular\"`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "fullscreenExitOutput",
+      "type": "string",
+      "default": "`\"transcript\"`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "fullscreenScrollbar",
+      "type": "string",
+      "default": "`\"auto\"`"
+    },
+    {
+      "group": "UI & Display",
+      "key": "fullscreenCopyOnSelect",
+      "type": "boolean",
+      "default": "`true`"
+    },
+    {
+      "group": "Network",
+      "key": "httpProxy",
+      "type": "string",
+      "default": "-"
+    },
+    {
+      "group": "Warnings",
+      "key": "warnings.anthropicExtraUsage",
+      "type": "boolean",
+      "default": "`true`"
+    },
+    {
+      "group": "Compaction",
+      "key": "compaction.enabled",
+      "type": "boolean",
+      "default": "`true`"
+    },
+    {
+      "group": "Compaction",
+      "key": "compaction.reserveTokens",
+      "type": "number",
+      "default": "`16384`"
+    },
+    {
+      "group": "Compaction",
+      "key": "compaction.keepRecentTokens",
+      "type": "number",
+      "default": "`20000`"
+    },
+    {
+      "group": "Branch Summary",
+      "key": "branchSummary.reserveTokens",
+      "type": "number",
+      "default": "`16384`"
+    },
+    {
+      "group": "Branch Summary",
+      "key": "branchSummary.skipPrompt",
+      "type": "boolean",
+      "default": "`false`"
+    },
+    {
+      "group": "Retry",
+      "key": "retry.enabled",
+      "type": "boolean",
+      "default": "`true`"
+    },
+    {
+      "group": "Retry",
+      "key": "retry.maxRetries",
+      "type": "number",
+      "default": "`3`"
+    },
+    {
+      "group": "Retry",
+      "key": "retry.baseDelayMs",
+      "type": "number",
+      "default": "`2000`"
+    },
+    {
+      "group": "Retry",
+      "key": "retry.provider.timeoutMs",
+      "type": "number",
+      "default": "SDK default"
+    },
+    {
+      "group": "Retry",
+      "key": "retry.provider.maxRetries",
+      "type": "number",
+      "default": "`0`"
+    },
+    {
+      "group": "Retry",
+      "key": "retry.provider.maxRetryDelayMs",
+      "type": "number",
+      "default": "`60000`"
+    },
+    {
+      "group": "Message Delivery",
+      "key": "steeringMode",
+      "type": "string",
+      "default": "`\"one-at-a-time\"`"
+    },
+    {
+      "group": "Message Delivery",
+      "key": "followUpMode",
+      "type": "string",
+      "default": "`\"one-at-a-time\"`"
+    },
+    {
+      "group": "Message Delivery",
+      "key": "transport",
+      "type": "string",
+      "default": "`\"auto\"`"
+    },
+    {
+      "group": "Message Delivery",
+      "key": "httpIdleTimeoutMs",
+      "type": "number",
+      "default": "`300000`"
+    },
+    {
+      "group": "Message Delivery",
+      "key": "websocketConnectTimeoutMs",
+      "type": "number",
+      "default": "`15000`"
+    },
+    {
+      "group": "Terminal & Images",
+      "key": "terminal.showImages",
+      "type": "boolean",
+      "default": "`true`"
+    },
+    {
+      "group": "Terminal & Images",
+      "key": "terminal.imageWidthCells",
+      "type": "number",
+      "default": "`60`"
+    },
+    {
+      "group": "Terminal & Images",
+      "key": "terminal.clearOnShrink",
+      "type": "boolean",
+      "default": "`false`"
+    },
+    {
+      "group": "Terminal & Images",
+      "key": "terminal.hyperlinks",
+      "type": "boolean or `\"auto\"`",
+      "default": "`\"auto\"`"
+    },
+    {
+      "group": "Terminal & Images",
+      "key": "terminal.images",
+      "type": "string or boolean",
+      "default": "`\"auto\"`"
+    },
+    {
+      "group": "Terminal & Images",
+      "key": "terminal.trueColor",
+      "type": "boolean or `\"auto\"`",
+      "default": "`\"auto\"`"
+    },
+    {
+      "group": "Terminal & Images",
+      "key": "images.autoResize",
+      "type": "boolean",
+      "default": "`true`"
+    },
+    {
+      "group": "Terminal & Images",
+      "key": "images.blockImages",
+      "type": "boolean",
+      "default": "`false`"
+    },
+    {
+      "group": "Shell",
+      "key": "shellPath",
+      "type": "string",
+      "default": "-"
+    },
+    {
+      "group": "Shell",
+      "key": "shellCommandPrefix",
+      "type": "string",
+      "default": "-"
+    },
+    {
+      "group": "Shell",
+      "key": "npmCommand",
+      "type": "string[]",
+      "default": "-"
+    },
+    {
+      "group": "Tools",
+      "key": "defaultTools",
+      "type": "string[]",
+      "default": "-"
+    },
+    {
+      "group": "Sessions",
+      "key": "sessionDir",
+      "type": "string",
+      "default": "-"
+    },
+    {
+      "group": "Model Cycling",
+      "key": "enabledModels",
+      "type": "string[]",
+      "default": "-"
+    },
+    {
+      "group": "Markdown",
+      "key": "markdown.codeBlockIndent",
+      "type": "string",
+      "default": "`\"  \"`"
+    },
+    {
+      "group": "Markdown",
+      "key": "markdown.mermaid",
+      "type": "string",
+      "default": "`\"streaming\"`"
+    },
+    {
+      "group": "Resources",
+      "key": "packages",
+      "type": "array",
+      "default": "`[]`"
+    },
+    {
+      "group": "Resources",
+      "key": "extensions",
+      "type": "string[]",
+      "default": "`[]`"
+    },
+    {
+      "group": "Resources",
+      "key": "skills",
+      "type": "string[]",
+      "default": "`[]`"
+    },
+    {
+      "group": "Resources",
+      "key": "prompts",
+      "type": "string[]",
+      "default": "`[]`"
+    },
+    {
+      "group": "Resources",
+      "key": "themes",
+      "type": "string[]",
+      "default": "`[]`"
+    },
+    {
+      "group": "Resources",
+      "key": "enableSkillCommands",
+      "type": "boolean",
+      "default": "`true`"
+    }
+  ]
+}
