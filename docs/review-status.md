@@ -11,3 +11,9 @@ September 12, 2026.
 - The local concept wrapper served successfully over loopback HTTP. Browser automation timed out twice while connecting, so rendered layout, responsive appearance, and click behavior have **not** been verified in a live browser.
 
 No app runtime, model inference, extension installation, live pi settings mutation, remote GitHub repository, or deployment was performed. UI direction and integration choice remain open for discussion.
+
+## Second concept round
+
+Austin chose the workbench direction, expanded the discussion toward an everyday pi GUI, and explicitly prioritized his personal use. Three new interactive layouts combine conversations and customization: Two spaces, Chat + inspector, and Integrated studio. See [personal GUI directions](personal-gui-directions.md).
+
+The new fragment passed JavaScript syntax, static ID-reference, duplicate-ID, and size checks. Browser automation timed out again while opening the preview, so rendered layout and live click behavior remain unverified. These are design previews; no runtime implementation started.

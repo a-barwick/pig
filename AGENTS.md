@@ -2,6 +2,8 @@
 
 This is Austin's personal project. Prioritize a useful end-to-end loop and avoid speculative infrastructure.
 
+Austin explicitly confirmed this is for his own use first. Current design direction combines everyday pi conversations with a customization workbench in a local browser app. Do not expand scope for teams, broad onboarding, a marketplace, or general-purpose productization.
+
 Current stage: ideation. Research, planning documents, and disposable UI concepts are in scope. Do not start application implementation until Austin explicitly moves the project to implementation.
 
 - Plans in this repo are proposals, not automatically adopted requirements.

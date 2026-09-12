@@ -6,6 +6,7 @@ A personal GUI for shaping Austin's pi harness: author skills, understand config
 
 ## Review
 
+- [Personal GUI concepts — latest round](docs/personal-gui-directions.md): three ways to combine chat and the workbench, for Austin's use first.
 - [Product plan and implementation options](docs/product-plan.md)
 - [Pi configuration inventory](docs/pi-configuration.md)
 - [Complete installed settings reference](docs/settings-reference.md)
