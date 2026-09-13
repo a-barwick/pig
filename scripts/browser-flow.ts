@@ -1,16 +1,34 @@
-import { chromium, expect } from "@playwright/test";
-import { mkdir, writeFile, readFile } from "node:fs/promises";
-import { join } from "node:path";
-const root = process.argv[2];
-const projectPath = join(root, "project");
-const out = "/tmp/pi-dashboard-browser";
+import { chromium, expect, type Page } from "@playwright/test";
+import { mkdir, writeFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
+import { startBuiltServer, type StartedServer } from "./helpers/server";
+
+const out = process.env.PI_DASHBOARD_BROWSER_OUT ?? "/tmp/pi-dashboard-browser";
 await mkdir(out, { recursive: true });
-const browser = await chromium.launch({ channel: "chrome", headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-const errors: string[] = [];
-page.on("pageerror", (e) => errors.push(e.message));
+const requestedOrigin = process.env.PI_DASHBOARD_ORIGIN;
+const external = process.env.PI_DASHBOARD_NO_SERVER === "1" || !!requestedOrigin;
+if (external && !process.argv[2])
+  throw new Error("An isolated acceptance root is required with an external server.");
+let server: StartedServer | undefined;
+if (!external)
+  server = await startBuiltServer({
+    root: process.argv[2],
+    port: Number(process.env.PORT ?? 4318),
+    useExistingAuth: true,
+    timeoutMs: 90_000,
+  });
+const root = resolve(process.argv[2] ?? server?.root ?? ".");
+const projectPath = join(root, "project");
+await mkdir(projectPath, { recursive: true });
+const origin = requestedOrigin ?? server?.origin ?? `http://127.0.0.1:${process.env.PORT ?? 4318}`;
+let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;
+let page: Page | undefined;
 try {
-  await page.goto("http://127.0.0.1:4318");
+  browser = await chromium.launch({ channel: "chrome", headless: true });
+  page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(origin, { waitUntil: "domcontentloaded" });
   await expect(page.getByText("connected", { exact: true })).toBeVisible();
   await page.getByLabel("Local project path").fill(projectPath);
   await page.getByRole("button", { name: "Open project", exact: true }).click();
@@ -85,6 +103,7 @@ try {
   console.log(
     JSON.stringify({
       errors,
+      origin,
       scrollWidth: await page.evaluate(
         () => document.documentElement.scrollWidth,
       ),
@@ -100,9 +119,12 @@ try {
     "PASS browser creation, diff, saved revision, outside-edit draft preservation, trial and responsive settings",
   );
 } catch (e) {
-  await page.screenshot({ path: out + "/failure.png", fullPage: true });
-  console.log((await page.locator("body").innerText()).slice(-4500));
+  if (page) {
+    await page.screenshot({ path: out + "/failure.png", fullPage: true });
+    console.log((await page.locator("body").innerText()).slice(-4500));
+  }
   throw e;
 } finally {
-  await browser.close();
+  await browser?.close();
+  await server?.stop();
 }

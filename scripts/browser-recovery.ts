@@ -1,40 +1,37 @@
-import { chromium, expect } from "@playwright/test";
-import { spawn, type ChildProcess } from "node:child_process";
+import { chromium, expect, type Page } from "@playwright/test";
 import { mkdir, writeFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
-const root = process.argv[2],
+import { startBuiltServer, type StartedServer } from "./helpers/server";
+const rootArg = process.argv[2];
+if (!rootArg)
+  throw new Error("Usage: pnpm exec tsx scripts/browser-recovery.ts <root>");
+const root = rootArg,
   projectPath = join(root, "project"),
-  origin = "http://127.0.0.1:4319",
-  out = "/tmp/pi-dashboard-browser";
-let server: ChildProcess;
+  port = Number(process.env.PORT ?? 4319),
+  origin = `http://127.0.0.1:${port}`,
+  out = process.env.PI_DASHBOARD_BROWSER_OUT ?? "/tmp/pi-dashboard-browser";
+await mkdir(out, { recursive: true });
+let server: StartedServer;
 async function start() {
-  server = spawn(
-    process.execPath,
-    ["--import", "tsx", "scripts/test-server.ts", root],
-    {
-      env: { ...process.env, PORT: "4319" },
-      stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
-  await new Promise<void>((r, e) => {
-    server.stdout!.on("data", (d) => {
-      if (String(d).includes(origin)) r();
-    });
-    server.once("exit", (code) => e(Error(`server exit ${code}`)));
+  server = await startBuiltServer({
+    root,
+    port,
+    useExistingAuth: true,
+    timeoutMs: 90_000,
   });
 }
 async function stop() {
-  const closed = new Promise<void>((r) => server.once("exit", () => r()));
-  server.kill("SIGTERM");
-  await closed;
+  await server.stop();
 }
 await start();
-const browser = await chromium.launch({ channel: "chrome", headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;
+let page: Page | undefined;
 const errors: string[] = [];
-page.on("pageerror", (e) => errors.push(e.message));
 const extension = join(projectPath, ".pi/extensions/browser-dialog.ts");
 try {
+  browser = await chromium.launch({ channel: "chrome", headless: true });
+  page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(origin);
   await expect(page.getByText("connected", { exact: true })).toBeVisible();
   await page
@@ -138,14 +135,15 @@ try {
     }),
   );
 } catch (e) {
-  await page.screenshot({
-    path: out + "/recovery-failure.png",
-    fullPage: true,
-  });
+  if (page)
+    await page.screenshot({
+      path: out + "/recovery-failure.png",
+      fullPage: true,
+    });
   console.log("FAILURE", String(e));
   throw e;
 } finally {
   await unlink(extension).catch(() => {});
-  await browser.close();
+  await browser?.close();
   await stop();
 }
