@@ -46,6 +46,25 @@ try {
   await page.getByLabel("Local project path").fill(projectPath);
   await page.getByRole("button", { name: "Open project", exact: true }).click();
   await expect(page.locator(".page-title .chip")).toHaveText("idle");
+  // Make recovery runnable on a fresh isolated root as well as after the
+  // creation flow. The latter leaves the existing revision untouched.
+  await page.getByRole("button", { name: "Skills", exact: true }).click();
+  if ((await page.getByRole("button", { name: /^browser-smoke/ }).count()) === 0) {
+    await page.getByRole("button", { name: "New project skill" }).click();
+    await page.getByLabel("Name", { exact: true }).fill("browser-smoke");
+    await page
+      .getByLabel("Description", { exact: true })
+      .fill("Explicit browser recovery test.");
+    await page
+      .getByLabel("Instructions", { exact: true })
+      .fill("Reply with BROWSER_RECOVERY_SKILL_OK.");
+    await page.getByRole("button", { name: "Review actual diff" }).click();
+    await page.getByRole("button", { name: "Save revision", exact: true }).click();
+    await expect(
+      page.getByText("Saved to disk. Not applied to the current conversation."),
+    ).toBeVisible();
+  }
+  await page.getByRole("button", { name: "Conversation", exact: true }).click();
   await page.getByRole("button", { name: /Use bash twice/ }).click();
   await expect(page.locator(".transcript")).toContainText(
     "PI_EXPECTED_FAILURE",
