@@ -36,6 +36,10 @@ pnpm build
 
 See [acceptance evidence](docs/acceptance.md) for live-provider and browser checks. `pnpm exec tsx scripts/smoke.ts` is an **explicit real-provider test**: it creates temporary settings, trust, skills and sessions, uses existing authentication, and performs model/tool turns. It does not modify your global settings. The other `scripts/browser-*` and test-server helpers are manual acceptance tooling, not app startup requirements.
 
+## Svelte AI authoring tools
+
+Codex loads the official Svelte MCP server from [the project configuration](.codex/config.toml) after the project is trusted and a new Codex session starts. The repo's [agent instructions](AGENTS.md) explain when to use its documentation and autofixer tools. This setup uses `npx` on demand; it adds no app dependency. The client is Svelte 5 with Vite, so SvelteKit guidance is only relevant if the stack changes. See [Svelte's local setup](https://svelte.dev/docs/ai/local-setup).
+
 ## Current limits
 
 - One active runtime session. Multi-agent conversations, attachments, branching, terminals, package installation and broad settings forms are deferred.

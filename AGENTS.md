@@ -16,3 +16,9 @@ Current stage: first slice implemented for local dogfooding. `docs/implementatio
 - Do not install community packages or alter live pi settings as part of research.
 - Use the current mockup in `design/pi-personal-workspace.html`: everyday conversation with an inspector, side-by-side workbench when editing. Stop at a useful learning point for Austin to dogfood.
 - Update current documents in place when decisions change. Remove superseded alternatives; Git history retains the exploration.
+
+## Svelte authoring tools
+
+The client is Svelte 5 with Vite, not SvelteKit. Use SvelteKit guidance only if the project adopts SvelteKit.
+
+For Svelte component or rune-module work, use the project-local Svelte MCP server: discover relevant documentation with `list-sections`, read it with `get-documentation`, and run `svelte-autofixer` on changed `.svelte` or `.svelte.ts` files before finishing. Keep `pnpm check` as the project type check.
