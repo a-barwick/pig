@@ -17,7 +17,7 @@ These are evidence questions. Do not imply a skill was followed merely because i
 
 - **Conversation first.** The normal path is open a project, resume or start a Pi session, talk, and see tools work. Inspection belongs close to the relevant turn and can stay quiet until wanted.
 - **Let behavior carry the idea.** The interface should feel direct and capable through its flow, speed, typography, and honest state. Do not put the product philosophy into headings, slogans, badges, or explanatory copy. Every visible word must help Austin act, orient, or verify something.
-- **Make the invisible visible.** Explain behavior with the actual context, tool definition, call, result, and configuration source. Prefer a compact receipt connected to a turn over an abstract score or reassuring badge.
+- **Make the invisible visible.** Explain behavior with the actual context, tool definition, call, result, and configuration source. Keep evidence folded into the relevant conversation turn until Austin asks to inspect it.
 - **User-shaped, file-backed.** Pi's configuration files and JSONL sessions remain authoritative. A GUI edit is an edit to a clearly named source; dashboard preferences are identified separately. Never silently invent a second source of truth.
 - **Change, try, learn.** For a customization, show the disk diff, save explicitly, then start a fresh session to test the saved revision. Carry the revision and load evidence into the trial. Let Austin judge whether it helped.
 - **Small and honest.** Add a surface when it helps Austin use the core loop, explains an observed surprise, or cheaply reuses a Pi capability. Mark unsupported or deferred capabilities plainly. Sample data and mock UI must identify themselves as such.
