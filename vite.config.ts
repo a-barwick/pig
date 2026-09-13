@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { sveltekit } from "@sveltejs/kit/vite";
 export default defineConfig({
-  plugins: [svelte()],
-  build: { outDir: "dist/client" },
+  plugins: [sveltekit()],
+  server: { host: "127.0.0.1", port: Number(process.env.PORT ?? 4317), strictPort: true },
 });
