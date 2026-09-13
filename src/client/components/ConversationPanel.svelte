@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snapshot, Thinking } from '../../shared/contracts';
-  import Inspector from './Inspector.svelte';
+  import type { ConversationDraft } from '../features/conversation/conversationDraft.svelte';
+  import InspectorPane from './InspectorPane.svelte';
   import Composer from './Composer.svelte';
   import DialogStack from './DialogStack.svelte';
   import Transcript from './Transcript.svelte';
@@ -13,44 +14,44 @@
     cancelled?: boolean,
   ) => void;
 
+  type ConversationActions = {
+    stop: () => void | Promise<unknown>;
+    selectModel: (value: string) => void | Promise<unknown>;
+    selectThinking: (value: Thinking) => void | Promise<unknown>;
+    answerDialog: DialogAnswer;
+    trust: () => void | Promise<unknown>;
+  };
+
+  type ConversationInspector = {
+    visible: boolean;
+    selectedTool: string | null;
+    select: (name: string) => void;
+    toggle: () => void;
+    reset: () => void;
+  };
+
   type Props = {
     snapshot: Snapshot | null;
-    text?: string;
+    draft: ConversationDraft;
     disabled: boolean;
     staleSession: boolean;
     running: boolean;
     notice: string;
     section: Section;
-    inspector: boolean;
-    selectedTool: string | null;
-    onsubmit: () => Promise<boolean>;
-    onstop: () => void;
-    onselectmodel: (value: string) => void;
-    onselectthinking: (value: Thinking) => void;
-    onanswer: DialogAnswer;
-    oninspect: (name: string) => void;
-    ontrust: () => void;
-    ontoggleinspector: () => void;
+    actions: ConversationActions;
+    inspector: ConversationInspector;
   };
 
   let {
     snapshot,
-    text = $bindable(''),
+    draft,
     disabled,
     staleSession,
     running,
     notice,
     section,
+    actions,
     inspector,
-    selectedTool,
-    onsubmit,
-    onstop,
-    onselectmodel,
-    onselectthinking,
-    onanswer,
-    oninspect,
-    ontrust,
-    ontoggleinspector,
   }: Props = $props();
 
   // The token keeps follow state inside Transcript while preserving the
@@ -58,8 +59,11 @@
   let followLatestRequest = $state(0);
 
   async function submit() {
-    if (await onsubmit()) followLatestRequest += 1;
+    if (await draft.submit()) followLatestRequest += 1;
   }
+
+  // TODO(refactor): Keep the inline inspector here provisionally; revisit its
+  // component boundary after the workspace shell and inspector migration land.
 </script>
 
 <main class="center">
@@ -92,37 +96,37 @@
     <Transcript
       {snapshot}
       {followLatestRequest}
-      {oninspect}
+      oninspect={inspector.select}
     />
     <DialogStack
       dialogs={snapshot.dialogs}
       busy={disabled || staleSession}
-      {onanswer}
+      onanswer={actions.answerDialog}
     />
     <Composer
       {snapshot}
-      bind:text
+      bind:text={draft.text}
       {disabled}
       {staleSession}
       {running}
       {notice}
       onsubmit={submit}
-      {onstop}
-      {onselectmodel}
-      {onselectthinking}
+      onstop={actions.stop}
+      onselectmodel={actions.selectModel}
+      onselectthinking={actions.selectThinking}
     />
-    {#if section}<button class="link-button" onclick={ontoggleinspector}
-        >{inspector ? 'Hide' : 'Show'} harness inspector</button
+    {#if section}<button class="link-button" onclick={inspector.toggle}
+        >{inspector.visible ? 'Hide' : 'Show'} harness inspector</button
       >{/if}
-    {#if section && inspector}<aside
+    {#if section && inspector.visible}<aside
         class="inline-inspector"
         aria-label="Harness inspector"
       >
-        <Inspector
+        <InspectorPane
           {snapshot}
-          {selectedTool}
+          selectedTool={inspector.selectedTool}
           busy={disabled || staleSession}
-          ontrust={ontrust}
+          ontrust={actions.trust}
         />
       </aside>{/if}
   {/if}

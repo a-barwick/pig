@@ -94,9 +94,9 @@ describe('workspace controller', () => {
     expect(mocks.unsubscribe).toHaveBeenCalledOnce();
   });
 
-  it('keeps an unsaved workbench draft on an unsolicited project switch', async () => {
+  it('keeps unsaved work on an unsolicited session switch', async () => {
     const workspace = createWorkspaceController({
-      hasUnsavedWorkbenchDraft: () => true,
+      hasUnsavedWork: () => true,
     });
     await workspace.connect();
 
@@ -106,15 +106,27 @@ describe('workspace controller', () => {
       kind: 'snapshot',
       snapshot: snapshot({
         sessionId: 'session-two',
-        projectPath: '/project-two',
+        projectPath: '/project-one',
         cursor: 2,
       }),
     });
 
     expect(workspace.snapshot?.projectPath).toBe('/project-one');
+    expect(workspace.snapshot?.sessionId).toBe('session-one');
     expect(workspace.staleSession).toBe(true);
-    expect(workspace.error).toContain('unsaved workbench draft');
+    expect(workspace.error).toContain('unsaved draft');
     expect(await workspace.submit('should not send')).toBe(false);
+    workspace.dispose();
+  });
+
+  it('allows an explicit skill trial to adopt its new session', async () => {
+    const workspace = createWorkspaceController({ hasUnsavedWork: () => true });
+    await workspace.connect();
+
+    workspace.adoptTrial(snapshot({ sessionId: 'trial-session', cursor: 2 }));
+
+    expect(workspace.snapshot?.sessionId).toBe('trial-session');
+    expect(workspace.staleSession).toBe(false);
     workspace.dispose();
   });
 });

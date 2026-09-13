@@ -8,10 +8,10 @@ export type WorkspaceConnection =
 
 export interface WorkspaceControllerOptions {
   /**
-   * Used only for unsolicited server-side project switches. Explicit
-   * navigation is guarded by App, where the message and draft are visible.
+   * Refactor follow-up: keep unsolicited session replacement guarded here
+   * until draft ownership and navigation policy have a settled home.
    */
-  hasUnsavedWorkbenchDraft?: () => boolean;
+  hasUnsavedWork?: () => boolean;
 }
 
 export interface WorkspaceController {
@@ -116,6 +116,9 @@ export function createWorkspaceController(
   function receive(
     value: Parameters<typeof normalizeSnapshot>[0],
     allowSwitch = false,
+    // Explicit mutations have already passed the UI guard before the server
+    // changes sessions; only unsolicited replacements need this protection.
+    explicitSwitch = false,
   ): boolean {
     const next = normalizeSnapshot(value);
 
@@ -129,14 +132,16 @@ export function createWorkspaceController(
     const changedSession = snapshot?.sessionId !== next.sessionId;
     if (
       allowSwitch &&
+      !explicitSwitch &&
       !navigating &&
       snapshot &&
-      snapshot.projectPath !== next.projectPath &&
-      options.hasUnsavedWorkbenchDraft?.()
+      (next.sessionId !== snapshot.sessionId ||
+        next.projectPath !== snapshot.projectPath) &&
+      options.hasUnsavedWork?.()
     ) {
       staleSession = true;
       error =
-        'The server switched projects. Your unsaved workbench draft is preserved. Save or discard it before reconnecting.';
+        'The server switched conversations. Your unsaved draft is preserved. Save or discard it before reconnecting.';
       return false;
     }
 
@@ -253,7 +258,7 @@ export function createWorkspaceController(
       navigating = true;
       try {
         const next = await api.open.mutate({ projectPath, sessionPath });
-        receive(next, true);
+        receive(next, true, true);
         notice = '';
         remember(next.projectPath);
         await refreshSessions(next.projectPath);
@@ -341,12 +346,12 @@ export function createWorkspaceController(
     const projectPath = snapshot?.projectPath;
     if (!projectPath || staleSession || disabled) return false;
     return perform(async () => {
-      receive(await api.trust.mutate({ projectPath }), true);
+      receive(await api.trust.mutate({ projectPath }), true, true);
     });
   }
 
   function adoptTrial(next: Snapshot): void {
-    receive(next, true);
+    receive(next, true, true);
     notice =
       'Fresh skill trial opened. Inspect resource loading evidence in the harness.';
     void refreshSessions(next.projectPath);
