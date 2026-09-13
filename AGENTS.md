@@ -19,6 +19,6 @@ Current stage: first slice implemented for local dogfooding. `docs/implementatio
 
 ## Svelte authoring tools
 
-The client is Svelte 5 with Vite, not SvelteKit. Use SvelteKit guidance only if the project adopts SvelteKit.
+The app is SvelteKit 2 with Svelte 5, Vite 8, and adapter-node. SSR stays enabled. Keep privileged code under `src/lib/server`, browser code under `src/lib/client`, and serializable contracts under `src/lib/shared`. The only event feed is the tRPC Fetch subscription at `/trpc/events`.
 
 For Svelte component or rune-module work, use the project-local Svelte MCP server: discover relevant documentation with `list-sections`, read it with `get-documentation`, and run `svelte-autofixer` on changed `.svelte` or `.svelte.ts` files before finishing. Keep `pnpm check` as the project type check.

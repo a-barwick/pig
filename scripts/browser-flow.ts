@@ -28,6 +28,8 @@ try {
   page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
+  page.on('console', message => { if (/hydration_/i.test(message.text())) errors.push(message.text()); });
+  await page.addInitScript(path => localStorage.setItem('pi.recentProjects', JSON.stringify([path])), projectPath);
   await page.goto(origin, { waitUntil: "domcontentloaded" });
   await expect(page.getByText("connected", { exact: true })).toBeVisible();
   await page.getByLabel("Local project path").fill(projectPath);
@@ -115,6 +117,8 @@ try {
     page.getByRole("combobox", { name: /^Default thinking/ }),
   ).toBeVisible();
   await page.screenshot({ path: out + "/settings-half.png", fullPage: true });
+  expect(errors).toEqual([]);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(760);
   console.log(
     "PASS browser creation, diff, saved revision, outside-edit draft preservation, trial and responsive settings",
   );

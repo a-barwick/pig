@@ -44,7 +44,7 @@ async function waitForHttp(
   const started = Date.now();
   let lastError = "";
   while (Date.now() - started < timeoutMs) {
-    if (child.exitCode !== null)
+    if (child.exitCode !== null || child.signalCode !== null)
       throw new Error(
         `Built Kit server exited before becoming ready (code ${child.exitCode}).\n${output()}`,
       );
@@ -52,7 +52,7 @@ async function waitForHttp(
     const timer = setTimeout(() => controller.abort(), 1_000);
     try {
       const response = await fetch(url, { signal: controller.signal });
-      if (response.status >= 200 && response.status < 500) {
+      if (response.ok && output().includes(`Listening on ${new URL(url).origin}`)) {
         await response.arrayBuffer();
         return;
       }
@@ -128,9 +128,9 @@ export async function startBuiltServer(
     if (stopping) return stopping;
     stopping = (async () => {
       removeSignalHandlers();
-      if (child.exitCode === null) child.kill("SIGTERM");
+      if (child.exitCode === null && child.signalCode === null) child.kill("SIGTERM");
       await new Promise<void>((resolve, reject) => {
-        if (child.exitCode !== null) {
+        if (child.exitCode !== null || child.signalCode !== null) {
           resolve();
           return;
         }
@@ -240,9 +240,9 @@ export class LocalRpcClient {
   readonly eventsPath: string;
   #cookie = "";
 
-  constructor(baseUrl: string, eventsPath = process.env.PI_DASHBOARD_EVENTS_PATH ?? "/trpc/events") {
+  constructor(baseUrl: string) {
     this.baseUrl = baseUrl.replace(/\/$/, "");
-    this.eventsPath = eventsPath;
+    this.eventsPath = "/trpc/events";
   }
 
   private recordCookies(response: Response) {

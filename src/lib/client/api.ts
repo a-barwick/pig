@@ -10,7 +10,7 @@ export const api = createTRPCClient<AppRouter>({
   links: [
     splitLink({
       condition: (operation) => operation.type === "subscription",
-      true: httpSubscriptionLink({ url: "/trpc/events" }),
+      true: httpSubscriptionLink({ url: "/trpc" }),
       false: httpLink({ url: "/trpc" }),
     }),
   ],

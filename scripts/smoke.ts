@@ -11,35 +11,13 @@ import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import assert from "node:assert/strict";
+import type { Snapshot } from '../src/lib/shared/contracts';
 import {
   LocalRpcClient,
   readSseFrame,
   startBuiltServer,
   type StartedServer,
 } from "./helpers/server";
-
-interface ToolCall {
-  id: string;
-  name: string;
-  args?: unknown;
-  result?: unknown;
-  status: string;
-}
-interface Snapshot {
-  sessionId: string;
-  projectPath: string;
-  sessionFile?: string;
-  status: string;
-  messages: Array<{ role: string; text: string; toolCalls?: ToolCall[] }>;
-  tools: Array<{ name: string }>;
-  resources: Array<{ kind: string; loaded: boolean; reason?: string }>;
-  thinking: string;
-  dialogs: unknown[];
-  cursor: number;
-  trust: { trusted: boolean; reason: string };
-  trial?: { path: string; revision: string; loaded: boolean };
-  [key: string]: unknown;
-}
 
 const root = await mkdtemp(join(tmpdir(), "pi-dashboard-smoke-"));
 const agentDir = join(root, "agent");
@@ -77,6 +55,7 @@ const report: Record<string, unknown> = {
   model,
   transport: "built adapter-node via tRPC RPC",
 };
+console.log(JSON.stringify({phase:'starting isolated live acceptance',root,model}));
 
 const snapshots = (value: unknown) => value as Snapshot;
 const calls = (snapshot: Snapshot) =>
@@ -89,8 +68,7 @@ async function waitFor(
   const deadline = Date.now() + timeoutMs;
   let snapshot = snapshots(await client.state<Snapshot | null>());
   while (
-    !snapshot ||
-    (!predicate(snapshot) && Date.now() < deadline)
+    (!snapshot || !predicate(snapshot)) && Date.now() < deadline
   ) {
     await new Promise((resolve) => setTimeout(resolve, 150));
     snapshot = snapshots(await client.state<Snapshot | null>());
@@ -176,7 +154,7 @@ try {
   assert(settingSave.ok);
   state = snapshots(await rpc("open", { projectPath }, "POST"));
   state = await waitIdle();
-  assert.equal(state.thinking, "medium");
+  assert.equal(state.thinking, "medium", `Project thinking with model ${JSON.stringify(state.model)}: ${state.error ?? 'no runtime error'}`);
   assert.equal(await readFile(join(agentDir, "settings.json"), "utf8"), baseline);
   settings = await rpc<any>("settings", { projectPath, scope: "project" });
   settingSave = await rpc<any>(
@@ -325,4 +303,5 @@ try {
   console.log(JSON.stringify(report, null, 2));
 } finally {
   await server?.stop().catch(() => {});
+  assert.deepEqual(await readFile(globalPath), actualGlobal, 'Actual global settings changed during acceptance');
 }

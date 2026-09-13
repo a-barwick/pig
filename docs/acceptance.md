@@ -1,4 +1,30 @@
-# First-slice acceptance — September 12, 2026
+# Local acceptance — September 12, 2026
+
+## SvelteKit migration — current verification
+
+The workspace now runs through SvelteKit 2.70.3, Svelte 5.57.0, Vite 8.3.0, and adapter-node 5.5.7. Pi remains pinned to 0.85.1. The starting branch was clean at `7466860`; its 47-test baseline passed before migration. The final app has one Kit listener and one tRPC Fetch SSE feed at `/trpc/events`, with SSR enabled. See [the migration execution record](sveltekit-migration-plan.md).
+
+| Check | Current evidence |
+| --- | --- |
+| Install, types, tests, build | `pnpm install --frozen-lockfile`, `pnpm check` (zero errors/warnings), `pnpm test` (55 tests in 10 files), and `pnpm build` passed. |
+| SSE selection gate | Both tRPC and native SSE passed the dev/built four-cell comparison for authoritative snapshots, ordered text/tool events, abort cleanup (`1 → 0` listeners), rotation/reconnect, and SIGINT/SIGTERM. The strengthened rerun removed forced process exits. tRPC was selected; native/probe routes are absent from the product tree. |
+| Real Kit request boundary | `pnpm exec tsx scripts/kit-boundary-check.ts` passed against both actual Kit dev and `node build`: both hostnames, changed ports, SSR controls in HTML, exact Host/Origin/Fetch-Site rejection including JSON POSTs, cookie issuance/rotation, query/mutation, SSE, and explicit restart semantics. |
+| Body size and static assets | A 128 KiB prompt request and 256 KiB skill save fit the built adapter's default 512 KiB limit. An oversized body was rejected (tRPC maps the adapter size error to HTTP 400). Public built assets bypass the hook without cookies. Client JS scan found no pi SDK, Node filesystem/crypto imports, runtime implementation, auth path, or process-cookie material. |
+| Runtime ownership and dev reload | Unit tests verify concurrent initialization, one disposer, and stable signal counts across module reloads. The dev-server check triggers an actual service-module reload and verifies the same process cookie and active session ID. |
+| Lifecycle | Final dev SIGTERM/SIGINT checks with SSE open exited in 21/64 ms; built checks in 10/9 ms. Chrome recovery also stopped the built server during an actual running `bash sleep 30` tool in under eight seconds. |
+| Real pi conversation | The built-server smoke used existing authenticated `openai-codex/gpt-5.6-sol`. Separate successful and failed bash calls retained arguments/results and distinct outcomes. Stop and steer returned the session to idle. Browser Send/Steer/Stop also exercised real streaming activity. |
+| Persistence and hydration | Chrome refresh preserved the session ID and exact message history, with real transcript content present in SSR HTML. A server restart rotated the cookie; an unsent message and unsaved skill draft survived reconnect and the old session remained stale until explicit resume. Saved JSONL history resumed without rerunning tools. Prepopulated recents and a Pacific/Auckland browser timezone produced no hydration warnings or JavaScript errors. |
+| Skill/settings/trust loop | Real workbench creation, diff, save, outside-edit conflict and draft preservation, recovery, and saved-revision invocation passed. The model returned `BROWSER_REVISION_OK`; a separate smoke loaded revision `fc18ef4fc06291a085cb9e85aba63ed62288cb6b75bef8251556949e468629ce` and returned `SKILL_REVISION_TWO`. Scoped Medium and removal back to global High passed; untrusted resources and explicit temporary-project trust were verified. |
+| Browser and dialogs | Chrome checked 1440×1000 and 760×900 layouts: empty, conversation/tool inspection, skill editor/diff, settings, error, disconnected, running, and extension-input-dialog states. Half-window scroll width was 760. Screenshots were visually inspected; recovery finished with `errors: []`. |
+| Configuration preservation | All test writes used temporary settings/trust/skill/session directories. Existing auth was used in place, never copied into the checkout. Actual global settings remained byte-for-byte identical, including after the full browser sequence. |
+
+The shell initially could not launch Chrome or expose authenticated models inside its sandbox. Repeating those authorized checks with normal host permissions passed; no required provider/browser check remains blocked. This is local implementation and acceptance evidence, not Austin's own dogfood feedback or a hosted deployment.
+
+Reproduce with `pnpm exec tsx scripts/smoke.ts`, then use its printed temporary root with `scripts/browser-flow.ts <root>` and `scripts/browser-recovery.ts <root>`. These launch the actual Kit Node build on isolated test ports. Current local artifacts include `/private/tmp/pi-kit-recovery.log`, `/tmp/pi-dashboard-browser/`, and the temporary smoke root ending in `pi-dashboard-smoke-Qy7rEn`. They are not fixtures or session exports in the repository.
+
+## Historical first-slice evidence
+
+The record below describes the earlier standalone-server implementation. Its commands, counts, and server architecture are historical; use the migration verification and current README above for the current app.
 
 The integrated app uses Svelte/TypeScript, the local Node server, typed tRPC HTTP calls and an SSE subscription, and `@earendil-works/pi-coding-agent` pinned to 0.85.1. The main implementation ran in visible Herdr agents `pi-runtime`, `pi-ui`, and `pi-workbench`; the lead owned contracts, dependencies, integration and final verification.
 

@@ -1,6 +1,6 @@
 # Pi Dashboard
 
-Austin’s local pi workspace: real project conversations, a harness inspector, and a skill editor beside the conversation. Built with Svelte 5, TypeScript, a local Node server, tRPC over HTTP/SSE, and the pinned pi coding-agent SDK **0.85.1**.
+Austin’s local pi workspace: real project conversations, a harness inspector, and a skill editor beside the conversation. Built with SvelteKit 2, Svelte 5, TypeScript, adapter-node, tRPC over HTTP/SSE, and the pinned pi coding-agent SDK **0.85.1**.
 
 ## Run locally
 
@@ -11,9 +11,13 @@ pnpm build
 pnpm start
 ```
 
-Open **http://localhost:4317** or the printed **http://127.0.0.1:4317** URL. Keep the terminal running; Ctrl+C stops it. Restart with `pnpm start`. `pnpm dev` serves the client with Vite hot reload. Set `PORT` to choose another port.
+Open **http://localhost:4317** or **http://127.0.0.1:4317**. Keep the terminal running; Ctrl+C stops it. Restart with `pnpm start`. `pnpm dev` runs Kit with Vite hot reload. `PORT=4320 pnpm start` or `PORT=4320 pnpm dev` chooses another strict loopback port. The built entry point is `HOST=127.0.0.1 PORT=4317 node build`.
 
 The server uses your existing pi authentication and configuration, and pi owns session persistence in its normal agent directory. Browser local storage holds recent project paths. No credentials or session copies belong in this repository. The process binds loopback and validates Host/Origin; RPC and SSE require a same-origin, HttpOnly session cookie. Pi tools run with the server process’s permissions.
+
+Kit owns HTML rendering, routing, static assets, and the Node listener. A server load supplies a redacted snapshot; a controller per page hydrates it and connects to the single tRPC SSE feed on mount. Server-only services retain one pi runtime across requests and ordinary hot reloads. Restart the dev server to apply changes to runtime/config service implementations. A page refresh keeps the active session; a process restart requires explicit resume from pi’s JSONL history.
+
+This is a direct local server, with no proxy: leave `ORIGIN`, forwarded-header adapter settings, and `SOCKET_PATH` unset. Private page/API responses are not cached. Static assets bypass the request hook and contain only the public app bundle. The built server retains adapter-node’s 512 KiB request limit; an oversized tRPC request returns a body-limit error.
 
 ## First conversation and skill
 
@@ -32,13 +36,14 @@ After a server restart, reconnect and open/resume the saved conversation. Loadin
 pnpm check
 pnpm test
 pnpm build
+pnpm exec tsx scripts/kit-boundary-check.ts
 ```
 
 See [acceptance evidence](docs/acceptance.md) for live-provider and browser checks. `pnpm exec tsx scripts/smoke.ts` is an **explicit real-provider test**: it creates temporary settings, trust, skills and sessions, uses existing authentication, and performs model/tool turns. It does not modify your global settings. The other `scripts/browser-*` and test-server helpers are manual acceptance tooling, not app startup requirements.
 
 ## Svelte AI authoring tools
 
-Codex loads the official Svelte MCP server from [the project configuration](.codex/config.toml) after the project is trusted and a new Codex session starts. The repo's [agent instructions](AGENTS.md) explain when to use its documentation and autofixer tools. This setup uses `npx` on demand; it adds no app dependency. The client is Svelte 5 with Vite, so SvelteKit guidance is only relevant if the stack changes. See [Svelte's local setup](https://svelte.dev/docs/ai/local-setup).
+Codex loads the official Svelte MCP server from [the project configuration](.codex/config.toml) after the project is trusted and a new Codex session starts. The repo's [agent instructions](AGENTS.md) require its documentation and autofixer for component/rune work. This setup uses `npx` on demand; it adds no app dependency. Use SvelteKit and Svelte 5 guidance. See [Svelte's local setup](https://svelte.dev/docs/ai/local-setup).
 
 ## Current limits
 

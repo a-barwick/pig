@@ -30,8 +30,10 @@ const errors: string[] = [];
 const extension = join(projectPath, ".pi/extensions/browser-dialog.ts");
 try {
   browser = await chromium.launch({ channel: "chrome", headless: true });
-  page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, timezoneId:'Pacific/Auckland' });
   page.on("pageerror", (e) => errors.push(e.message));
+  page.on('console', message => { if (/hydration_/i.test(message.text())) errors.push(message.text()); });
+  await page.addInitScript(path => localStorage.setItem('pi.recentProjects', JSON.stringify([path])), projectPath);
   await page.goto(origin);
   await expect(page.getByText("connected", { exact: true })).toBeVisible();
   await page
@@ -48,7 +50,10 @@ try {
   await expect(page.locator(".page-title .chip")).toHaveText("idle");
   // Make recovery runnable on a fresh isolated root as well as after the
   // creation flow. The latter leaves the existing revision untouched.
+  const skillsLoaded = page.waitForResponse(response => response.url().includes('/trpc/skills') && response.ok());
   await page.getByRole("button", { name: "Skills", exact: true }).click();
+  await skillsLoaded;
+  await expect(page.getByRole('button',{name:'New project skill'})).toBeEnabled();
   if ((await page.getByRole("button", { name: /^browser-smoke/ }).count()) === 0) {
     await page.getByRole("button", { name: "New project skill" }).click();
     await page.getByLabel("Name", { exact: true }).fill("browser-smoke");
@@ -65,7 +70,13 @@ try {
     ).toBeVisible();
   }
   await page.getByRole("button", { name: "Conversation", exact: true }).click();
-  await page.getByRole("button", { name: /Use bash twice/ }).click();
+  const savedTools = page.getByRole("button", { name: /Use bash twice/ });
+  if (await savedTools.count()) await savedTools.first().click();
+  else {
+    await page.getByLabel('Message to pi').fill('Use bash twice: first run printf PI_TOOL_OK; then run a separate bash command that prints PI_EXPECTED_FAILURE to stderr and exits 7. Report their results briefly. Do not modify files.');
+    await page.getByRole('button', {name:'Send',exact:true}).click();
+  }
+  await expect(page.locator('.page-title .chip')).toHaveText('idle',{timeout:120000});
   await expect(page.locator(".transcript")).toContainText(
     "PI_EXPECTED_FAILURE",
   );
@@ -76,6 +87,15 @@ try {
   await tool.locator("summary").click();
   await tool.getByRole("button", { name: "Inspect tool definition" }).click();
   await expect(page.locator("#tool-bash")).toHaveAttribute("open", "");
+  const beforeRefresh = (await (await page.request.get(origin + '/trpc/state')).json()).result.data;
+  const serverHtml = await (await page.request.get(origin)).text();
+  expect(serverHtml).toContain('PI_TOOL_OK');
+  await page.reload();
+  await expect(page.getByText('connected',{exact:true})).toBeVisible();
+  const afterRefresh = (await (await page.request.get(origin + '/trpc/state')).json()).result.data;
+  expect(afterRefresh.sessionId).toBe(beforeRefresh.sessionId);
+  expect(afterRefresh.messages).toEqual(beforeRefresh.messages);
+  await expect(page.locator('.session-list time').first()).toBeVisible();
   await page.screenshot({ path: out + "/tools-desktop.png", fullPage: true });
   await page.setViewportSize({ width: 760, height: 900 });
   await page.screenshot({ path: out + "/tools-half.png", fullPage: true });
@@ -91,7 +111,13 @@ try {
     page.getByRole("combobox", { name: /^Default thinking/ }),
   ).toBeVisible();
   await page.screenshot({ path: out + "/settings-half.png", fullPage: true });
-  await page.getByRole("button", { name: "Conversation", exact: true }).click();
+  await page.getByRole('button',{name:'Skills',exact:true}).click();
+  await page.getByRole('button',{name:/^browser-smoke/}).click();
+  const recoveryEditor = page.getByLabel('SKILL.md',{exact:true});
+  const savedEditorText = await recoveryEditor.inputValue();
+  const workbenchDraft = savedEditorText + '\nUnsaved migration workbench draft\n';
+  await recoveryEditor.fill(workbenchDraft);
+  await page.getByLabel('Message to pi').fill('Unsent migration recovery draft');
   await stop();
   await expect(
     page.getByRole("button", { name: "Reconnect", exact: true }),
@@ -100,15 +126,22 @@ try {
   await start();
   await page.getByRole("button", { name: "Reconnect", exact: true }).click();
   await expect(page.getByText("connected", { exact: true })).toBeVisible();
+  await expect(page.getByLabel('Message to pi')).toHaveValue('Unsent migration recovery draft');
+  await expect(recoveryEditor).toHaveValue(workbenchDraft);
+  await expect(page.getByRole('button',{name:'Send',exact:true})).toBeDisabled();
+  await page.getByLabel('Message to pi').fill('');
+  await recoveryEditor.fill(savedEditorText);
+  await page.getByRole('button',{name:'Conversation',exact:true}).click();
   // Open and resume the same persisted real conversation after an actual process restart.
   await page.getByLabel("Local project path").fill(projectPath);
   await page.getByRole("button", { name: "Open project", exact: true }).click();
   await expect(page.locator(".page-title .chip")).toHaveText("idle");
-  await page.getByRole("button", { name: /Use bash twice/ }).click();
+  await page.getByRole("button", { name: /Use bash twice/ }).first().click();
   await expect(page.locator(".transcript")).toContainText(
     "PI_EXPECTED_FAILURE",
   );
   await expect(page.locator(".page-title .chip")).toHaveText("idle");
+  expect(errors).toEqual([]);
 
   await page
     .getByLabel("Message to pi")
@@ -147,10 +180,18 @@ try {
   await page.getByLabel("Response", { exact: true }).fill("Browser response");
   await page.getByRole("button", { name: "Submit response" }).click();
   await expect(page.locator(".page-title .chip")).toHaveText("idle");
+  await page.getByLabel('Message to pi').fill('For the shutdown test, call bash sleep 30 now. Do not use other tools.');
+  await page.getByRole('button',{name:'Send',exact:true}).click();
+  await expect(page.locator('.transcript .trace .chip').filter({hasText:'running'})).toBeVisible({timeout:90000});
+  const stoppingAt = Date.now();
+  await stop();
+  expect(Date.now() - stoppingAt).toBeLessThan(8000);
+  expect(errors).toEqual([]);
   console.log(
     JSON.stringify({
       pass: "real tool inspection, error, responsive editor/settings, disconnect/reconnect, process restart/resume, real extension dialog",
       errors,
+      shutdownDuringTool: true,
     }),
   );
 } catch (e) {
