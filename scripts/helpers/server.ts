@@ -122,26 +122,42 @@ export async function startBuiltServer(
     throw error;
   }
 
-  let stopped = false;
+  let stopping: Promise<void> | undefined;
+  let removeSignalHandlers = () => {};
   const stop = async () => {
-    if (stopped) return;
-    stopped = true;
-    if (child.exitCode === null) child.kill("SIGTERM");
-    await new Promise<void>((resolve, reject) => {
-      if (child.exitCode !== null) {
-        resolve();
-        return;
-      }
-      const timer = setTimeout(() => {
-        child.kill("SIGKILL");
-        reject(new Error(`Timed out stopping built Kit server.\n${output}`));
-      }, 20_000);
-      child.once("exit", () => {
-        clearTimeout(timer);
-        resolve();
+    if (stopping) return stopping;
+    stopping = (async () => {
+      removeSignalHandlers();
+      if (child.exitCode === null) child.kill("SIGTERM");
+      await new Promise<void>((resolve, reject) => {
+        if (child.exitCode !== null) {
+          resolve();
+          return;
+        }
+        const timer = setTimeout(() => {
+          child.kill("SIGKILL");
+          reject(new Error(`Timed out stopping built Kit server.\n${output}`));
+        }, 20_000);
+        child.once("exit", () => {
+          clearTimeout(timer);
+          resolve();
+        });
       });
-    });
-    if (ownedRoot) await rm(root, { recursive: true, force: true });
+      if (ownedRoot) await rm(root, { recursive: true, force: true });
+    })();
+    return stopping;
+  };
+  const onSigint = () => {
+    void stop().finally(() => process.exit(130));
+  };
+  const onSigterm = () => {
+    void stop().finally(() => process.exit(143));
+  };
+  process.once("SIGINT", onSigint);
+  process.once("SIGTERM", onSigterm);
+  removeSignalHandlers = () => {
+    process.off("SIGINT", onSigint);
+    process.off("SIGTERM", onSigterm);
   };
 
   return { origin, port, root, agentDir, child, stop };
