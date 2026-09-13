@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
+  import type { Snapshot } from '../shared/contracts';
   import { createConversationDraft } from './features/conversation/conversationDraft.svelte';
   import { createInspectorState } from './workspace/inspectorState.svelte';
   import { createWorkspaceController } from './workspace/workspaceController.svelte';
@@ -7,10 +8,14 @@
   import WorkspaceLayout from './components/WorkspaceLayout.svelte';
   import './styles.css';
 
+  let { initialSnapshot = null }: { initialSnapshot: Snapshot | null } = $props();
+
   const inspector = createInspectorState();
-  // The controller consults this only after setup when a server snapshot arrives.
+  // Keep the controller's guard available while the navigation factory is
+  // being created; it is also used when reconnecting around unsaved drafts.
   const navigationRef: { current?: WorkspaceNavigation } = {};
   const workspace = createWorkspaceController({
+    initialSnapshot: untrack(() => initialSnapshot),
     hasUnsavedWork: () => navigationRef.current?.hasUnsavedWork ?? false,
   });
   const draft = createConversationDraft((text) => workspace.submit(text));

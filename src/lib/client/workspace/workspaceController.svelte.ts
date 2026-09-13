@@ -5,6 +5,12 @@ export type WorkspaceConnection = "connecting" | "connected" | "disconnected";
 
 export interface WorkspaceControllerOptions {
   /**
+   * Redacted page data supplied by SvelteKit during SSR. This value is already
+   * a typed Snapshot, so it must be seeded directly rather than passed through
+   * the JSON tRPC normalizer.
+   */
+  initialSnapshot?: Snapshot | null;
+  /**
    * Refactor follow-up: keep unsolicited session replacement guarded here
    * until draft ownership and navigation policy have a settled home.
    */
@@ -55,9 +61,11 @@ const message = (cause: unknown) =>
 export function createWorkspaceController(
   options: WorkspaceControllerOptions = {},
 ): WorkspaceController {
-  let snapshot = $state<Snapshot | null>(null);
+  let snapshot = $state<Snapshot | null>(options.initialSnapshot ?? null);
   let sessions = $state<SessionInfo[]>([]);
-  let recent = $state<string[]>(readRecentProjects());
+  // Browser storage is intentionally read from connect(), which App invokes
+  // from onMount. Factory construction must remain safe during SSR.
+  let recent = $state<string[]>([]);
   let error = $state("");
   let notice = $state("");
   let busy = $state(false);
@@ -156,10 +164,11 @@ export function createWorkspaceController(
     const generation = ++connectionGeneration;
     connection = "connecting";
     staleSession = snapshot !== null;
+    recent = readRecentProjects();
 
     try {
       // A server restart rotates the HttpOnly local-access cookie.
-      const response = await fetch("/", {
+      const response = await fetch("/api/bootstrap", {
         cache: "no-store",
         credentials: "same-origin",
       });

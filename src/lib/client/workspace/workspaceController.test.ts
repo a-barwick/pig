@@ -3,6 +3,7 @@ import type { RuntimeEvent, Snapshot } from "../../shared/contracts";
 import { createWorkspaceController } from "./workspaceController.svelte";
 
 const mocks = vi.hoisted(() => ({
+  normalize: vi.fn((value: Snapshot) => value),
   state: vi.fn(),
   sessions: vi.fn(),
   send: vi.fn(),
@@ -12,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../api", () => ({
-  normalizeSnapshot: (value: Snapshot) => value,
+  normalizeSnapshot: mocks.normalize,
   api: {
     state: { query: mocks.state },
     sessions: { query: mocks.sessions },
@@ -67,6 +68,30 @@ beforeEach(() => {
 });
 
 describe("workspace controller", () => {
+  it("seeds the SSR snapshot directly and defers browser storage until connect", async () => {
+    const getItem = vi.fn(() => JSON.stringify(["/recent-project"]));
+    vi.stubGlobal("localStorage", { getItem, setItem: vi.fn() });
+    const initial = snapshot({ projectPath: "/ssr-project" });
+    const workspace = createWorkspaceController({ initialSnapshot: initial });
+
+    expect(workspace.snapshot).toEqual(initial);
+    expect(getItem).not.toHaveBeenCalled();
+    expect(mocks.normalize).not.toHaveBeenCalled();
+
+    mocks.state.mockResolvedValue(initial);
+
+    await workspace.connect();
+
+    expect(getItem).toHaveBeenCalledWith("pi.recentProjects");
+    expect(workspace.recent).toEqual(["/recent-project"]);
+    expect(mocks.normalize).toHaveBeenCalled();
+    expect(vi.mocked(fetch)).toHaveBeenCalledWith(
+      "/api/bootstrap",
+      expect.objectContaining({ credentials: "same-origin" }),
+    );
+    workspace.dispose();
+  });
+
   it("routes accepted messages to send or steer using live session status", async () => {
     const workspace = createWorkspaceController();
     await workspace.connect();
