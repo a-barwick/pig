@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import type { SessionInfo, Snapshot } from '../../shared/contracts';
 
   export type WorkspaceSection = 'skills' | 'settings' | null;
@@ -40,6 +41,13 @@
 
   let projectInput = $state('');
   let syncedProjectPath: string | null | undefined;
+  // Keep the server-rendered label stable for hydration, then opt into the
+  // browser's familiar local representation once the DOM is mounted.
+  let hydrated = $state(false);
+
+  onMount(() => {
+    hydrated = true;
+  });
 
   // Keep an in-progress path entry intact while snapshots stream for the same project.
   $effect(() => {
@@ -80,7 +88,7 @@
       >Open project</button
     >
   </form>
-  {#each recent as path}
+  {#each recent as path (path)}
     <button
       class="recent"
       title={path}
@@ -99,7 +107,7 @@
       >Refresh sessions</button
     >
     <div class="session-list" role="group" aria-label="Saved conversations">
-      {#each sessions as session}
+      {#each sessions as session (session.path)}
         <button
           class="recent"
           title={`${session.name || 'Untitled conversation'}
@@ -111,7 +119,11 @@ ${session.path}`}
           ><span class="session-title"
             >{session.name || 'Untitled conversation'}</span
           ><span class="tiny"
-            >{new Date(session.updatedAt).toLocaleString()}</span
+            ><time datetime={session.updatedAt}
+              >{hydrated
+                ? new Date(session.updatedAt).toLocaleString()
+                : session.updatedAt}</time
+            ></span
           ></button
         >
       {:else}
