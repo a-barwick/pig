@@ -16,7 +16,7 @@ export interface ConversationDraft {
 export type SubmitConversation = (text: string) => Promise<boolean>;
 
 class ConversationDraftState implements ConversationDraft {
-  text = $state('');
+  text = $state("");
   #submitConversation: SubmitConversation;
 
   constructor(submitConversation: SubmitConversation) {
@@ -28,7 +28,7 @@ class ConversationDraftState implements ConversationDraft {
   }
 
   clear = () => {
-    this.text = '';
+    this.text = "";
   };
 
   submit = async () => {
@@ -39,7 +39,7 @@ class ConversationDraftState implements ConversationDraft {
     const accepted = await this.#submitConversation(submitted);
     // Preserve edits made while the request was in flight. The raw value is
     // compared so even a deliberate whitespace edit is not lost.
-    if (accepted && this.text === original) this.text = '';
+    if (accepted && this.text === original) this.text = "";
     return accepted;
   };
 }

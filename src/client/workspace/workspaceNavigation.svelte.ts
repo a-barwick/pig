@@ -1,13 +1,13 @@
-import type { ConversationDraft } from '../features/conversation/conversationDraft.svelte';
-import type { InspectorState } from './inspectorState.svelte';
-import type { WorkspaceController } from './workspaceController.svelte';
+import type { ConversationDraft } from "../features/conversation/conversationDraft.svelte";
+import type { InspectorState } from "./inspectorState.svelte";
+import type { WorkspaceController } from "./workspaceController.svelte";
 
-export type WorkspaceSection = 'skills' | 'settings' | null;
+export type WorkspaceSection = "skills" | "settings" | null;
 
 export interface WorkspaceNavigationOptions {
-  workspace: Pick<WorkspaceController, 'openProject' | 'trust'>;
-  draft: Pick<ConversationDraft, 'hasUnsentMessage' | 'clear'>;
-  inspector?: Pick<InspectorState, 'reset'>;
+  workspace: Pick<WorkspaceController, "openProject" | "trust">;
+  draft: Pick<ConversationDraft, "hasUnsentMessage" | "clear">;
+  inspector?: Pick<InspectorState, "reset">;
   /** Injectable for focused tests; the browser confirm dialog is the default. */
   confirm?: (message: string) => boolean;
 }
@@ -25,11 +25,11 @@ export interface WorkspaceNavigation {
 }
 
 const UNSAVED_NAVIGATION_MESSAGE =
-  'Discard the unsaved skill/settings draft or unsent message and continue?';
-const UNSAVED_WORKBENCH_MESSAGE = 'Discard the unsaved workbench draft?';
+  "Discard the unsaved skill/settings draft or unsent message and continue?";
+const UNSAVED_WORKBENCH_MESSAGE = "Discard the unsaved workbench draft?";
 
 function browserConfirm(message: string): boolean {
-  return typeof window !== 'undefined' ? window.confirm(message) : false;
+  return typeof window !== "undefined" ? window.confirm(message) : false;
 }
 
 /**
@@ -101,7 +101,7 @@ export function createWorkspaceNavigation(
   function beforeUnload(event: BeforeUnloadEvent): void {
     if (!hasUnsavedWork) return;
     event.preventDefault();
-    event.returnValue = '';
+    event.returnValue = "";
   }
 
   return {

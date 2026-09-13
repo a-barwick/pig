@@ -1,12 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from "vitest";
 import {
   createWorkspaceNavigation,
   type WorkspaceNavigationOptions,
-} from './workspaceNavigation.svelte';
+} from "./workspaceNavigation.svelte";
 
-function makeNavigation(
-  overrides: Partial<WorkspaceNavigationOptions> = {},
-) {
+function makeNavigation(overrides: Partial<WorkspaceNavigationOptions> = {}) {
   let unsent = false;
   const draft = {
     get hasUnsentMessage() {
@@ -42,8 +40,8 @@ function makeNavigation(
   };
 }
 
-describe('workspace navigation', () => {
-  it('combines workbench and conversation drafts for unload and controller guards', () => {
+describe("workspace navigation", () => {
+  it("combines workbench and conversation drafts for unload and controller guards", () => {
     const state = makeNavigation();
     expect(state.navigation.hasUnsavedWork).toBe(false);
 
@@ -55,7 +53,7 @@ describe('workspace navigation', () => {
       preventDefault: () => {
         prevented = true;
       },
-      returnValue: '',
+      returnValue: "",
     } as BeforeUnloadEvent);
     expect(prevented).toBe(true);
 
@@ -64,40 +62,42 @@ describe('workspace navigation', () => {
     expect(state.navigation.hasUnsavedWork).toBe(true);
   });
 
-  it('guards workbench section changes and clears dirty state after confirmation', () => {
+  it("guards workbench section changes and clears dirty state after confirmation", () => {
     const state = makeNavigation();
     state.navigation.setWorkbenchDirty(true);
     state.confirm.mockReturnValueOnce(false);
 
-    expect(state.navigation.showSection('skills')).toBe(false);
+    expect(state.navigation.showSection("skills")).toBe(false);
     expect(state.navigation.section).toBe(null);
     expect(state.navigation.workbenchDirty).toBe(true);
     expect(state.confirm).toHaveBeenCalledWith(
-      'Discard the unsaved workbench draft?',
+      "Discard the unsaved workbench draft?",
     );
 
-    expect(state.navigation.showSection('skills')).toBe(true);
-    expect(state.navigation.section).toBe('skills');
+    expect(state.navigation.showSection("skills")).toBe(true);
+    expect(state.navigation.section).toBe("skills");
     expect(state.navigation.workbenchDirty).toBe(false);
   });
 
-  it('clears feature state only after an explicit project/session open succeeds', async () => {
+  it("clears feature state only after an explicit project/session open succeeds", async () => {
     const state = makeNavigation();
-    state.navigation.showSection('settings');
+    state.navigation.showSection("settings");
     state.navigation.setWorkbenchDirty(true);
     state.setUnsent(true);
 
     state.workspace.openProject.mockResolvedValueOnce(false);
-    expect(await state.navigation.openProject(' /project-two ')).toBe(false);
-    expect(state.navigation.section).toBe('settings');
+    expect(await state.navigation.openProject(" /project-two ")).toBe(false);
+    expect(state.navigation.section).toBe("settings");
     expect(state.navigation.workbenchDirty).toBe(true);
     expect(state.draft.clear).not.toHaveBeenCalled();
     expect(state.inspector.reset).not.toHaveBeenCalled();
 
-    expect(await state.navigation.openProject(' /project-two ', '/session.json')).toBe(true);
+    expect(
+      await state.navigation.openProject(" /project-two ", "/session.json"),
+    ).toBe(true);
     expect(state.workspace.openProject).toHaveBeenLastCalledWith(
-      ' /project-two ',
-      '/session.json',
+      " /project-two ",
+      "/session.json",
     );
     expect(state.navigation.section).toBe(null);
     expect(state.navigation.workbenchDirty).toBe(false);
@@ -105,7 +105,7 @@ describe('workspace navigation', () => {
     expect(state.inspector.reset).toHaveBeenCalledOnce();
   });
 
-  it('guards trust reload with the same combined draft policy and preserves drafts', async () => {
+  it("guards trust reload with the same combined draft policy and preserves drafts", async () => {
     const state = makeNavigation();
     state.navigation.setWorkbenchDirty(true);
     state.setUnsent(true);

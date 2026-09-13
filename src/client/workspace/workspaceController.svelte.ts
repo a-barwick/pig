@@ -1,10 +1,7 @@
-import { api, normalizeSnapshot } from '../api';
-import type { SessionInfo, Snapshot, Thinking } from '../../shared/contracts';
+import { api, normalizeSnapshot } from "../api";
+import type { SessionInfo, Snapshot, Thinking } from "../../shared/contracts";
 
-export type WorkspaceConnection =
-  | 'connecting'
-  | 'connected'
-  | 'disconnected';
+export type WorkspaceConnection = "connecting" | "connected" | "disconnected";
 
 export interface WorkspaceControllerOptions {
   /**
@@ -61,11 +58,11 @@ export function createWorkspaceController(
   let snapshot = $state<Snapshot | null>(null);
   let sessions = $state<SessionInfo[]>([]);
   let recent = $state<string[]>(readRecentProjects());
-  let error = $state('');
-  let notice = $state('');
+  let error = $state("");
+  let notice = $state("");
   let busy = $state(false);
   let staleSession = $state(false);
-  let connection = $state<WorkspaceConnection>('connecting');
+  let connection = $state<WorkspaceConnection>("connecting");
 
   let unsubscribe: (() => void) | undefined;
   let connectionGeneration = 0;
@@ -73,19 +70,19 @@ export function createWorkspaceController(
 
   let running = $derived(
     !staleSession &&
-      (snapshot?.status === 'running' || snapshot?.status === 'stopping'),
+      (snapshot?.status === "running" || snapshot?.status === "stopping"),
   );
-  let disabled = $derived(busy || connection !== 'connected');
+  let disabled = $derived(busy || connection !== "connected");
 
   function readRecentProjects(): string[] {
     try {
-      if (typeof localStorage === 'undefined') return [];
+      if (typeof localStorage === "undefined") return [];
       const stored: unknown = JSON.parse(
-        localStorage.getItem('pi.recentProjects') ?? '[]',
+        localStorage.getItem("pi.recentProjects") ?? "[]",
       );
       return Array.isArray(stored)
         ? stored
-            .filter((item): item is string => typeof item === 'string')
+            .filter((item): item is string => typeof item === "string")
             .slice(0, 10)
         : [];
     } catch {
@@ -97,7 +94,7 @@ export function createWorkspaceController(
   function remember(path: string) {
     recent = [path, ...recent.filter((item) => item !== path)].slice(0, 10);
     try {
-      localStorage.setItem('pi.recentProjects', JSON.stringify(recent));
+      localStorage.setItem("pi.recentProjects", JSON.stringify(recent));
     } catch {
       // Browser storage is optional.
     }
@@ -126,8 +123,7 @@ export function createWorkspaceController(
     // conversation, and a reconnect must not move the cursor backwards.
     if (!allowSwitch && snapshot && next.sessionId !== snapshot.sessionId)
       return false;
-    if (!allowSwitch && snapshot && next.cursor < snapshot.cursor)
-      return false;
+    if (!allowSwitch && snapshot && next.cursor < snapshot.cursor) return false;
 
     const changedSession = snapshot?.sessionId !== next.sessionId;
     if (
@@ -141,7 +137,7 @@ export function createWorkspaceController(
     ) {
       staleSession = true;
       error =
-        'The server switched conversations. Your unsaved draft is preserved. Save or discard it before reconnecting.';
+        "The server switched conversations. Your unsaved draft is preserved. Save or discard it before reconnecting.";
       return false;
     }
 
@@ -158,14 +154,14 @@ export function createWorkspaceController(
     unsubscribe?.();
     unsubscribe = undefined;
     const generation = ++connectionGeneration;
-    connection = 'connecting';
+    connection = "connecting";
     staleSession = snapshot !== null;
 
     try {
       // A server restart rotates the HttpOnly local-access cookie.
-      const response = await fetch('/', {
-        cache: 'no-store',
-        credentials: 'same-origin',
+      const response = await fetch("/", {
+        cache: "no-store",
+        credentials: "same-origin",
       });
       if (!response.ok)
         throw new Error(`Local workspace returned HTTP ${response.status}`);
@@ -173,12 +169,12 @@ export function createWorkspaceController(
 
       const state = await api.state.query();
       if (generation !== connectionGeneration) return;
-      if (!preserveError) error = '';
+      if (!preserveError) error = "";
       if (state) receive(state, true);
       if (snapshot) await refreshSessions(snapshot.projectPath);
     } catch (cause) {
       if (generation === connectionGeneration) {
-        connection = 'disconnected';
+        connection = "disconnected";
         error = `Could not reconnect: ${message(cause)}`;
       }
       return;
@@ -188,45 +184,45 @@ export function createWorkspaceController(
     let first = true;
     const subscription = api.events.subscribe(undefined, {
       onStarted() {
-        if (generation === connectionGeneration) connection = 'connected';
+        if (generation === connectionGeneration) connection = "connected";
       },
       onConnectionStateChange(state) {
         if (generation !== connectionGeneration) return;
         connection =
-          state.state === 'pending'
-            ? 'connected'
-            : state.state === 'connecting'
-              ? 'connecting'
-              : 'disconnected';
-        if (state.state === 'connecting') {
+          state.state === "pending"
+            ? "connected"
+            : state.state === "connecting"
+              ? "connecting"
+              : "disconnected";
+        if (state.state === "connecting") {
           first = true;
           staleSession = snapshot !== null;
         }
       },
       onData(event) {
         if (generation !== connectionGeneration || navigating) return;
-        connection = 'connected';
+        connection = "connected";
         if (event.snapshot) {
           const wasRunning =
-            snapshot?.status === 'running' || snapshot?.status === 'stopping';
+            snapshot?.status === "running" || snapshot?.status === "stopping";
           // The first snapshot is authoritative after a reconnect, including
           // server restarts; later snapshots remain session/cursor guarded.
           receive(event.snapshot, first);
           first = false;
-          if (wasRunning && event.snapshot.status === 'idle')
+          if (wasRunning && event.snapshot.status === "idle")
             void refreshSessions(event.snapshot.projectPath);
         }
-        if (event.sessionId === snapshot?.sessionId && event.kind === 'error')
-          error = event.message ?? 'Runtime error';
+        if (event.sessionId === snapshot?.sessionId && event.kind === "error")
+          error = event.message ?? "Runtime error";
       },
       onError(cause) {
         if (generation === connectionGeneration) {
-          connection = 'disconnected';
+          connection = "disconnected";
           error = `Connection lost: ${message(cause)}`;
         }
       },
       onComplete() {
-        if (generation === connectionGeneration) connection = 'disconnected';
+        if (generation === connectionGeneration) connection = "disconnected";
       },
     });
     unsubscribe = () => subscription.unsubscribe();
@@ -235,7 +231,7 @@ export function createWorkspaceController(
   async function perform(action: () => Promise<void>): Promise<boolean> {
     if (busy) return false;
     busy = true;
-    error = '';
+    error = "";
     try {
       await action();
       return true;
@@ -259,7 +255,7 @@ export function createWorkspaceController(
       try {
         const next = await api.open.mutate({ projectPath, sessionPath });
         receive(next, true, true);
-        notice = '';
+        notice = "";
         remember(next.projectPath);
         await refreshSessions(next.projectPath);
       } finally {
@@ -284,8 +280,8 @@ export function createWorkspaceController(
       if (steering) await api.steer.mutate(input);
       else await api.send.mutate(input);
       notice = steering
-        ? 'Steering message accepted; waiting for runtime progress.'
-        : 'Message accepted; waiting for runtime progress.';
+        ? "Steering message accepted; waiting for runtime progress."
+        : "Message accepted; waiting for runtime progress.";
     });
   }
 
@@ -296,13 +292,13 @@ export function createWorkspaceController(
       staleSession ||
       disabled ||
       !running ||
-      active.status === 'stopping'
+      active.status === "stopping"
     )
       return false;
 
     return perform(async () => {
       await api.stop.mutate({ sessionId: active.sessionId });
-      notice = 'Cancellation requested; waiting for runtime confirmation.';
+      notice = "Cancellation requested; waiting for runtime confirmation.";
     });
   }
 
@@ -353,7 +349,7 @@ export function createWorkspaceController(
   function adoptTrial(next: Snapshot): void {
     receive(next, true, true);
     notice =
-      'Fresh skill trial opened. Inspect resource loading evidence in the harness.';
+      "Fresh skill trial opened. Inspect resource loading evidence in the harness.";
     void refreshSessions(next.projectPath);
   }
 
@@ -406,10 +402,10 @@ export function createWorkspaceController(
     trust,
     adoptTrial,
     clearError() {
-      error = '';
+      error = "";
     },
     clearNotice() {
-      notice = '';
+      notice = "";
     },
   };
 }

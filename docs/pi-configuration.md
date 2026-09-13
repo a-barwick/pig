@@ -10,22 +10,22 @@ Pi is installed through Node 22.23.2. Selected non-secret defaults are `openai-c
 
 ## Configuration surfaces
 
-| Surface | Where pi reads it | What the GUI could change |
-| --- | --- | --- |
-| General settings | `~/.pi/agent/settings.json`, trusted `<project>/.pi/settings.json` | Model defaults, thinking, context, retries, tools, resource paths, terminal/display preferences; [complete table](settings-reference.md) |
-| Skills | `~/.pi/agent/skills/`, `~/.agents/skills/`, trusted project `.pi/skills/` and ancestor `.agents/skills/`, package/settings/CLI sources | Frontmatter, instructions, scripts, references, enablement, source path |
-| Prompt templates | Global/project `prompts/` under the pi config directories; packages and explicit sources | Command name from filename, description, argument hints, Markdown, positional/default arguments |
-| Context instructions | Global `AGENTS.md`; ancestor/current `AGENTS.md` or `CLAUDE.md`; `AGENTS.override.md` replaces same-directory alternatives | Edit exact source, explain ordered concatenation; this is not one merged JSON object |
-| System prompt | Global/project `SYSTEM.md`; append via `APPEND_SYSTEM.md`; CLI equivalents | Replace or append instructions, with clear precedence and preview of assembled context |
-| Extensions | Global/project `extensions/`; package/settings sources; explicit `-e` | Add/remove source references, inspect code and registered tools/commands/events; extension-specific editors only where schemas exist |
-| Packages | `packages` entries in global/project settings and `pi` manifest in package.json | npm/git/local sources, version/ref, per-resource filters and autoload behavior |
-| Custom models/providers | `~/.pi/agent/models.json` | Endpoints, models, capabilities, provider compatibility, sampling, thinking maps, costs, auth references |
-| Authentication | `~/.pi/agent/auth.json`, provider environment variables, pi login | Show configured/unavailable state without rendering secrets; prefer existing pi auth flow |
-| Keybindings | `~/.pi/agent/keybindings.json` | Namespaced action → key or key array; binding collisions; `/reload` applies changes |
-| Themes | Global/project `themes/`, package/settings/CLI sources | Theme JSON palette/tokens; preview terminal theme separately from GUI appearance |
-| Project trust | `~/.pi/agent/trust.json`; global `defaultProjectTrust`; one-run flags | Explain trusted/ignored resources; explicit trust action. Trust changes need restart |
-| Session storage | `sessionDir`, environment, CLI; pi-managed JSONL | Storage destination and trial/session selection. Session content is runtime data, not a settings form |
-| Launch environment/arguments | Parent process and CLI | Config root, startup networking, tool selection, ephemeral trials, provider-specific environment references |
+| Surface                      | Where pi reads it                                                                                                                      | What the GUI could change                                                                                                                |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| General settings             | `~/.pi/agent/settings.json`, trusted `<project>/.pi/settings.json`                                                                     | Model defaults, thinking, context, retries, tools, resource paths, terminal/display preferences; [complete table](settings-reference.md) |
+| Skills                       | `~/.pi/agent/skills/`, `~/.agents/skills/`, trusted project `.pi/skills/` and ancestor `.agents/skills/`, package/settings/CLI sources | Frontmatter, instructions, scripts, references, enablement, source path                                                                  |
+| Prompt templates             | Global/project `prompts/` under the pi config directories; packages and explicit sources                                               | Command name from filename, description, argument hints, Markdown, positional/default arguments                                          |
+| Context instructions         | Global `AGENTS.md`; ancestor/current `AGENTS.md` or `CLAUDE.md`; `AGENTS.override.md` replaces same-directory alternatives             | Edit exact source, explain ordered concatenation; this is not one merged JSON object                                                     |
+| System prompt                | Global/project `SYSTEM.md`; append via `APPEND_SYSTEM.md`; CLI equivalents                                                             | Replace or append instructions, with clear precedence and preview of assembled context                                                   |
+| Extensions                   | Global/project `extensions/`; package/settings sources; explicit `-e`                                                                  | Add/remove source references, inspect code and registered tools/commands/events; extension-specific editors only where schemas exist     |
+| Packages                     | `packages` entries in global/project settings and `pi` manifest in package.json                                                        | npm/git/local sources, version/ref, per-resource filters and autoload behavior                                                           |
+| Custom models/providers      | `~/.pi/agent/models.json`                                                                                                              | Endpoints, models, capabilities, provider compatibility, sampling, thinking maps, costs, auth references                                 |
+| Authentication               | `~/.pi/agent/auth.json`, provider environment variables, pi login                                                                      | Show configured/unavailable state without rendering secrets; prefer existing pi auth flow                                                |
+| Keybindings                  | `~/.pi/agent/keybindings.json`                                                                                                         | Namespaced action → key or key array; binding collisions; `/reload` applies changes                                                      |
+| Themes                       | Global/project `themes/`, package/settings/CLI sources                                                                                 | Theme JSON palette/tokens; preview terminal theme separately from GUI appearance                                                         |
+| Project trust                | `~/.pi/agent/trust.json`; global `defaultProjectTrust`; one-run flags                                                                  | Explain trusted/ignored resources; explicit trust action. Trust changes need restart                                                     |
+| Session storage              | `sessionDir`, environment, CLI; pi-managed JSONL                                                                                       | Storage destination and trial/session selection. Session content is runtime data, not a settings form                                    |
+| Launch environment/arguments | Parent process and CLI                                                                                                                 | Config root, startup networking, tool selection, ephemeral trials, provider-specific environment references                              |
 
 `models-store.json`, sessions, and trust records are runtime-managed data. Do not treat every JSON file under `~/.pi/agent` as freely editable configuration.
 
@@ -33,17 +33,17 @@ Sources: [settings](https://github.com/earendil-works/pi/blob/main/packages/codi
 
 ## Settings families
 
-| Family | Principal controls | Suggested placement |
-| --- | --- | --- |
-| Model and thinking | Provider/model default, per-model thinking, supported levels, budgets, model cycling | Primary configuration and trial header |
-| Skills, prompts, extensions, themes | Source paths, filters, packages, skill slash commands | Resource library |
-| Tools | Initial built-ins; separate CLI allowlist/exclusions | Trial setup and advanced configuration |
-| Context | Automatic compaction, response reserve, recent-context retention, branch summaries | Advanced model settings |
-| Reliability/transport | Retry layers, timeout, stream transport, proxy | Advanced connection settings |
-| Shell | Shell path, command prefix, npm invocation | Advanced execution settings |
-| Terminal/editor | TUI/fullscreen, keybindings, theme, image protocol, Markdown, padding | Terminal preferences, separate from GUI preferences |
-| Privacy/trust | Project loading decisions, startup telemetry/analytics, image blocking | Clear dedicated section |
-| Sessions | Storage location, launch persistence/resume | Project/trial setup |
+| Family                              | Principal controls                                                                   | Suggested placement                                 |
+| ----------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| Model and thinking                  | Provider/model default, per-model thinking, supported levels, budgets, model cycling | Primary configuration and trial header              |
+| Skills, prompts, extensions, themes | Source paths, filters, packages, skill slash commands                                | Resource library                                    |
+| Tools                               | Initial built-ins; separate CLI allowlist/exclusions                                 | Trial setup and advanced configuration              |
+| Context                             | Automatic compaction, response reserve, recent-context retention, branch summaries   | Advanced model settings                             |
+| Reliability/transport               | Retry layers, timeout, stream transport, proxy                                       | Advanced connection settings                        |
+| Shell                               | Shell path, command prefix, npm invocation                                           | Advanced execution settings                         |
+| Terminal/editor                     | TUI/fullscreen, keybindings, theme, image protocol, Markdown, padding                | Terminal preferences, separate from GUI preferences |
+| Privacy/trust                       | Project loading decisions, startup telemetry/analytics, image blocking               | Clear dedicated section                             |
+| Sessions                            | Storage location, launch persistence/resume                                          | Project/trial setup                                 |
 
 The full table is intentionally broader than MVP forms. Unknown fields must survive edits; pi metadata such as `lastChangelogVersion` should not become a normal user control.
 
@@ -78,22 +78,22 @@ Auth/header config values can be literals, `$ENV_VAR` interpolation, or `!comman
 
 ## Launch controls
 
-| Controls | Use |
-| --- | --- |
-| `PI_CODING_AGENT_DIR` | Choose a separate harness config root; defaults to `~/.pi/agent` |
-| `--session-dir`, `PI_CODING_AGENT_SESSION_DIR`, `sessionDir` | Session location, highest-to-lowest precedence |
-| `--provider`, `--model`, `--thinking`, `--models` | Run-specific model selection |
-| `--tools`, `--exclude-tools`, `--no-tools`, `--no-builtin-tools` | Tool exposure; `defaultTools` only governs initial built-ins and does not disable extension/custom tools |
-| `--skill`, `-e`, `--prompt-template`, `--theme` | Explicit resource sources |
-| `--no-skills`, `--no-extensions`, `--no-prompt-templates`, `--no-themes`, `--no-context-files` | Discovery controls; explicit skill paths remain additive |
-| `--system-prompt`, `--append-system-prompt` | Run-specific instructions |
-| `--approve`, `--no-approve` | Per-run project resource trust; not per-tool authorization |
-| `--no-session`, `--continue`, `--resume`, `--session`, `--fork`, `--name` | Trial/session lifecycle |
-| `PI_OFFLINE`, `--offline` | Suppress startup network operations; not a general network sandbox or guarantee of local inference |
-| `PI_SKIP_VERSION_CHECK`, `PI_TELEMETRY`, `PI_CACHE_RETENTION` | Version requests, install telemetry override, supported extended caching |
-| `VISUAL`, `EDITOR`, `HTTP_PROXY`, `HTTPS_PROXY` | Editor/proxy fallbacks |
-| `PI_PACKAGE_DIR`, `PI_SHARE_VIEWER_URL` | Package-root and share-viewer customization |
-| `PI_HARDWARE_CURSOR`, `PI_HYPERLINKS`, `PI_IMAGE_PROTOCOL`, `PI_TRUE_COLOR`, `PI_TUI_ESC_TIMEOUT` | Advanced terminal detection/input |
+| Controls                                                                                          | Use                                                                                                      |
+| ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `PI_CODING_AGENT_DIR`                                                                             | Choose a separate harness config root; defaults to `~/.pi/agent`                                         |
+| `--session-dir`, `PI_CODING_AGENT_SESSION_DIR`, `sessionDir`                                      | Session location, highest-to-lowest precedence                                                           |
+| `--provider`, `--model`, `--thinking`, `--models`                                                 | Run-specific model selection                                                                             |
+| `--tools`, `--exclude-tools`, `--no-tools`, `--no-builtin-tools`                                  | Tool exposure; `defaultTools` only governs initial built-ins and does not disable extension/custom tools |
+| `--skill`, `-e`, `--prompt-template`, `--theme`                                                   | Explicit resource sources                                                                                |
+| `--no-skills`, `--no-extensions`, `--no-prompt-templates`, `--no-themes`, `--no-context-files`    | Discovery controls; explicit skill paths remain additive                                                 |
+| `--system-prompt`, `--append-system-prompt`                                                       | Run-specific instructions                                                                                |
+| `--approve`, `--no-approve`                                                                       | Per-run project resource trust; not per-tool authorization                                               |
+| `--no-session`, `--continue`, `--resume`, `--session`, `--fork`, `--name`                         | Trial/session lifecycle                                                                                  |
+| `PI_OFFLINE`, `--offline`                                                                         | Suppress startup network operations; not a general network sandbox or guarantee of local inference       |
+| `PI_SKIP_VERSION_CHECK`, `PI_TELEMETRY`, `PI_CACHE_RETENTION`                                     | Version requests, install telemetry override, supported extended caching                                 |
+| `VISUAL`, `EDITOR`, `HTTP_PROXY`, `HTTPS_PROXY`                                                   | Editor/proxy fallbacks                                                                                   |
+| `PI_PACKAGE_DIR`, `PI_SHARE_VIEWER_URL`                                                           | Package-root and share-viewer customization                                                              |
+| `PI_HARDWARE_CURSOR`, `PI_HYPERLINKS`, `PI_IMAGE_PROTOCOL`, `PI_TRUE_COLOR`, `PI_TUI_ESC_TIMEOUT` | Advanced terminal detection/input                                                                        |
 
 Provider credential/cloud environment variables are provider-specific; use the [provider reference](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/providers.md). `AI_AGENT`, `PI_CODING_AGENT`, and the `PI_SESSION_*`/`PI_MODEL`/`PI_PROVIDER`/`PI_REASONING_LEVEL` shell metadata are runtime outputs, not user preferences. Source: [environment variables](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/environment-variables.md).
 

@@ -33,11 +33,11 @@ Keep one active agent session initially. Pi owns conversation persistence; the a
 
 RPC describes calling remote functions; HTTP, SSE, and WebSocket describe how requests/events travel. They are not mutually exclusive choices.
 
-| Boundary | Recommended approach | Reason |
-| --- | --- | --- |
-| Svelte browser → local Node server | Typed RPC with tRPC's vanilla TypeScript client, over same-origin HTTP | Calls such as `sessions.send` and `skills.save` have checked inputs/outputs without separately handwritten client/server API types |
-| Local Node server → browser updates | tRPC subscription over Server-Sent Events (SSE) | One ordered feed for response text, tool activity, and session state; no polling. Stop/steer travel as separate RPC calls |
-| Local Node server → pi | Direct coding-agent SDK calls in the same process | Immediate access to sessions, tools, resources, and settings without another serialization layer |
+| Boundary                            | Recommended approach                                                   | Reason                                                                                                                             |
+| ----------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Svelte browser → local Node server  | Typed RPC with tRPC's vanilla TypeScript client, over same-origin HTTP | Calls such as `sessions.send` and `skills.save` have checked inputs/outputs without separately handwritten client/server API types |
+| Local Node server → browser updates | tRPC subscription over Server-Sent Events (SSE)                        | One ordered feed for response text, tool activity, and session state; no polling. Stop/steer travel as separate RPC calls          |
+| Local Node server → pi              | Direct coding-agent SDK calls in the same process                      | Immediate access to sessions, tools, resources, and settings without another serialization layer                                   |
 
 The implementation uses this transport; its HTTP/SSE access and delivery checks are recorded in acceptance.md. Use the vanilla tRPC client from Svelte; no React dependency or React query hooks. Input validation is still required even when TypeScript types agree.
 
@@ -60,13 +60,13 @@ This is part of the first usable conversation experience, not a later observabil
 
 ## Sequence and ownership
 
-| Thread | Owns | Depends on | Handoff evidence |
-| --- | --- | --- | --- |
-| **0 — Lead / bootstrap** | Root tooling, dependencies, shared event/data types, RPC router composition, server composition, integration | Nothing | App starts locally, SDK import/session creation works, browser/server interfaces below are defined, ownership is assigned |
-| **1 — Pi runtime** | `src/server/runtime/`, session commands/events, tool inventory and call data, runtime tests | 0 | One real conversation streams; tools are inspectable; cancel, steer, and resume work; failures reach the browser |
-| **2 — App experience** | Client shell, conversation, inspector, API client; excludes workbench feature files | 0 | Conversation and workbench layouts work against the shared contract; real runtime replaces isolated development fixtures |
-| **3 — Harness workbench** | `src/server/config/`, `src/client/features/workbench/`, config/skill tests | 0 | One skill and scoped defaults round-trip without unrelated changes; revision can be used in a fresh session |
-| **4 — Integration / dogfood** | Lead integrates 1–3; scoped fixes assigned back to owners | 1–3 | Verified real edit → run → inspect loop, launch instructions, limitations, clean commits |
+| Thread                        | Owns                                                                                                         | Depends on | Handoff evidence                                                                                                          |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **0 — Lead / bootstrap**      | Root tooling, dependencies, shared event/data types, RPC router composition, server composition, integration | Nothing    | App starts locally, SDK import/session creation works, browser/server interfaces below are defined, ownership is assigned |
+| **1 — Pi runtime**            | `src/server/runtime/`, session commands/events, tool inventory and call data, runtime tests                  | 0          | One real conversation streams; tools are inspectable; cancel, steer, and resume work; failures reach the browser          |
+| **2 — App experience**        | Client shell, conversation, inspector, API client; excludes workbench feature files                          | 0          | Conversation and workbench layouts work against the shared contract; real runtime replaces isolated development fixtures  |
+| **3 — Harness workbench**     | `src/server/config/`, `src/client/features/workbench/`, config/skill tests                                   | 0          | One skill and scoped defaults round-trip without unrelated changes; revision can be used in a fresh session               |
+| **4 — Integration / dogfood** | Lead integrates 1–3; scoped fixes assigned back to owners                                                    | 1–3        | Verified real edit → run → inspect loop, launch instructions, limitations, clean commits                                  |
 
 Threads 1–3 can work in parallel **after** thread 0 commits the scaffold and browser/server interfaces below. Do not independently create three apps or replace each other's package manifests. Agree boundary changes with the lead before editing another owner's files. Use separate branches/worktrees when the dispatching thread provisions them; if sharing a checkout, maintain strict path ownership and stage only your own files.
 
@@ -74,15 +74,15 @@ Threads 1–3 can work in parallel **after** thread 0 commits the scaffold and b
 
 “Shared contract” means the data and behavior that the Svelte UI and Node server agree on for a particular operation. It exists so the runtime, UI, and workbench threads can connect their work without guessing different request shapes or meanings. It is not a separate platform or a generic contract for all pi integrations.
 
-| Interface for | Shared between | What must agree | Why it matters |
-| --- | --- | --- | --- |
-| Opening a project and inspecting the harness | Runtime/config services and browser inspector | Project path, active session, model/thinking, loaded or skipped resources and reasons, configuration sources | The UI must show what pi actually loaded, not merely what files exist |
-| Sending, stopping, steering, and resuming | Runtime service and conversation UI | Inputs, session/request IDs, accepted/rejected response, subsequent completion/error events | “Message accepted” must not appear as “agent finished”; late events must not update another conversation |
-| Streaming messages and tool execution | Runtime service and conversation/tool views | Ordered event kinds and payloads, stable message/tool-call IDs, reconnect snapshot/cursor | The UI must assemble partial output correctly and distinguish repeated calls without rerunning work on reconnect |
-| Inspecting available tools | Runtime registry and Tools & extensions view | Tool names, descriptions, schemas, active state, and available source metadata | Austin can see the capabilities offered to the model and connect a call to its definition |
-| Editing skills and settings | Config service and workbench UI | Read result with file revision, draft/save input with destination/scope and expected revision, conflict/error result, saved/applied status | The UI must save the intended file without losing an outside edit or claiming the running agent already uses it |
-| Trying a saved skill | Config service, runtime service, workbench UI | Saved revision, target project/session, explicit invocation, actual load evidence | Austin can tell which version was tried and distinguish invocation from successful instruction-following |
-| Answering an extension dialog | Runtime service and browser dialog UI | Request ID, supported fields, response/cancel result | An extension must not leave the agent waiting on a terminal dialog that the browser cannot show |
+| Interface for                                | Shared between                                | What must agree                                                                                                                            | Why it matters                                                                                                   |
+| -------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Opening a project and inspecting the harness | Runtime/config services and browser inspector | Project path, active session, model/thinking, loaded or skipped resources and reasons, configuration sources                               | The UI must show what pi actually loaded, not merely what files exist                                            |
+| Sending, stopping, steering, and resuming    | Runtime service and conversation UI           | Inputs, session/request IDs, accepted/rejected response, subsequent completion/error events                                                | “Message accepted” must not appear as “agent finished”; late events must not update another conversation         |
+| Streaming messages and tool execution        | Runtime service and conversation/tool views   | Ordered event kinds and payloads, stable message/tool-call IDs, reconnect snapshot/cursor                                                  | The UI must assemble partial output correctly and distinguish repeated calls without rerunning work on reconnect |
+| Inspecting available tools                   | Runtime registry and Tools & extensions view  | Tool names, descriptions, schemas, active state, and available source metadata                                                             | Austin can see the capabilities offered to the model and connect a call to its definition                        |
+| Editing skills and settings                  | Config service and workbench UI               | Read result with file revision, draft/save input with destination/scope and expected revision, conflict/error result, saved/applied status | The UI must save the intended file without losing an outside edit or claiming the running agent already uses it  |
+| Trying a saved skill                         | Config service, runtime service, workbench UI | Saved revision, target project/session, explicit invocation, actual load evidence                                                          | Austin can tell which version was tried and distinguish invocation from successful instruction-following         |
+| Answering an extension dialog                | Runtime service and browser dialog UI         | Request ID, supported fields, response/cancel result                                                                                       | An extension must not leave the agent waiting on a terminal dialog that the browser cannot show                  |
 
 For example, `sessions.send({ sessionId, requestId, text })` returning “accepted” means the runtime queued or began handling the prompt; later events describe progress and completion. `skills.save({ resourceId, expectedRevision, content })` either returns the new saved revision or a conflict/error; it never silently overwrites a newer file. These are app-level examples, not native pi SDK signatures.
 

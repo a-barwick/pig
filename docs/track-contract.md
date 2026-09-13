@@ -2,7 +2,7 @@
 
 Lead owns root tooling/dependencies, src/shared/, src/server/router.ts, src/server/http.ts, src/server/index.ts, integration tests and final verification. Shared types are in src/shared/contracts.ts; router is the actual browser API. Request contract adjustments from lead; do not edit shared files.
 
-Runtime owns only src/server/runtime/**. Export async createRuntimeService(): Promise<RuntimeService> from index.ts. Config owns only src/server/config/** and src/client/features/workbench/**. Export createConfigService(): ConfigService from server index.ts. UI owns src/client/** excluding features/workbench/**. All use the shared checkout and stage only owned files. Do not edit dependencies or lockfile. Keep tests inside owned directories.
+Runtime owns only src/server/runtime/**. Export async createRuntimeService(): Promise<RuntimeService> from index.ts. Config owns only src/server/config/** and src/client/features/workbench/**. Export createConfigService(): ConfigService from server index.ts. UI owns src/client/** excluding features/workbench/\*\*. All use the shared checkout and stage only owned files. Do not edit dependencies or lockfile. Keep tests inside owned directories.
 
 Workbench mount: default export Workbench.svelte with props { projectPath: string; section: 'skills'|'settings'; ontrial: (snapshot: Snapshot)=>void; ondirty?: (dirty: boolean)=>void }. Imports API from src/client/api.ts, which UI owns and exports `api` (vanilla typed tRPC client). Workbench may exist alongside conversation. UI warns before navigation that would discard drafts.
 
