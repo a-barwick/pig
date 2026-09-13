@@ -18,23 +18,25 @@ The workspace now runs through SvelteKit 2.70.3, Svelte 5.57.0, Vite 8.3.0, and 
 | Browser and dialogs | Chrome checked 1440×1000 and 760×900 layouts: empty, conversation/tool inspection, skill editor/diff, settings, error, disconnected, running, and extension-input-dialog states. Half-window scroll width was 760. Screenshots were visually inspected; recovery finished with `errors: []`. |
 | Configuration preservation | All test writes used temporary settings/trust/skill/session directories. Existing auth was used in place, never copied into the checkout. Actual global settings remained byte-for-byte identical, including after the full browser sequence. |
 
+Fresh host-permission rerun on September 12: `pnpm build`, the dev/built Kit boundary check, live-provider smoke, Chrome shell check, workbench flow, and recovery flow all passed. Recovery used a separate temporary root with `defaultProjectTrust: "always"` so its test extension could load without inheriting the smoke conversation's earlier stop instruction. It reported `errors: []` and shutdown during a running tool.
+
 The shell initially could not launch Chrome or expose authenticated models inside its sandbox. Repeating those authorized checks with normal host permissions passed; no required provider/browser check remains blocked. This is local implementation and acceptance evidence, not Austin's own dogfood feedback or a hosted deployment.
 
-Reproduce with `pnpm exec tsx scripts/smoke.ts`, then use its printed temporary root with `scripts/browser-flow.ts <root>` and `scripts/browser-recovery.ts <root>`. These launch the actual Kit Node build on isolated test ports. Current local artifacts include `/private/tmp/pi-kit-recovery.log`, `/tmp/pi-dashboard-browser/`, and the temporary smoke root ending in `pi-dashboard-smoke-Qy7rEn`. They are not fixtures or session exports in the repository.
+Reproduce with `pnpm exec tsx scripts/smoke.ts`, then use its printed temporary root with `pnpm exec tsx scripts/browser-flow.ts <root>`. Run `pnpm exec tsx scripts/browser-recovery.ts <root>` against a separate temporary root whose isolated `agent/settings.json` sets `defaultProjectTrust` to `"always"`; this lets the test extension load and avoids prior smoke steering instructions. The browser helpers launch the actual Kit Node build on isolated test ports. Local screenshots are in `/tmp/pi-dashboard-browser/`; temporary test roots are not fixtures or session exports in the repository.
 
 ## Historical first-slice evidence
 
-The record below describes the earlier standalone-server implementation. Its commands, counts, and server architecture are historical; use the migration verification and current README above for the current app.
+The record below preserves first-slice evidence from before the Kit migration. Test counts are historical; the command examples use current pnpm equivalents. Use the Kit verification above and the current README for the running app.
 
-The integrated app uses Svelte/TypeScript, the local Node server, typed tRPC HTTP calls and an SSE subscription, and `@earendil-works/pi-coding-agent` pinned to 0.85.1. The main implementation ran in visible Herdr agents `pi-runtime`, `pi-ui`, and `pi-workbench`; the lead owned contracts, dependencies, integration and final verification.
+The first slice combined Svelte/TypeScript, typed tRPC HTTP calls and an SSE subscription, and `@earendil-works/pi-coding-agent` pinned to 0.85.1. The main implementation ran in visible Herdr agents `pi-runtime`, `pi-ui`, and `pi-workbench`; the lead owned contracts, dependencies, integration and final verification.
 
 ## Automated checks
 
-After the pnpm switch and localhost fix, `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test` (35 tests), and `pnpm build` passed. A production server returned HTTP 200 for both `localhost` and `127.0.0.1` on loopback. The original first-slice checks below remain historical evidence.
+After the pnpm switch and localhost fix, `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test` (35 tests), and `pnpm build` passed. The production endpoint returned HTTP 200 for both `localhost` and `127.0.0.1` on loopback. The first-slice checks below remain historical evidence.
 
-- `npm run check`: zero errors and zero warnings.
-- `npm test`: 34 tests passed across config preservation/conflicts, runtime lifecycle/trust/dialogs/redaction, tool result presentation, and HTTP/SSE access boundaries.
-- `npm run build`: production Svelte bundle built successfully.
+- `pnpm check`: zero errors and zero warnings.
+- `pnpm test`: 34 tests passed across config preservation/conflicts, runtime lifecycle/trust/dialogs/redaction, tool result presentation, and HTTP/SSE access boundaries.
+- `pnpm build`: production app built successfully.
 - Production dependency audit: zero reported vulnerabilities at installation time.
 
 ## Real acceptance evidence
