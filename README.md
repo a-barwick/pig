@@ -6,12 +6,12 @@ Austin’s local pi workspace: real project conversations, a harness inspector, 
 
 ```sh
 cd /Users/austinbarwick/Documents/dev/agents/pi-dashboard
-npm install
-npm run build
-npm start
+pnpm install
+pnpm build
+pnpm start
 ```
 
-Open **http://127.0.0.1:4317**. Keep the terminal running; Ctrl+C stops it. Restart with `npm start`. `npm run dev` serves the client with Vite hot reload. Set `PORT` to choose another port; use the printed `127.0.0.1` URL.
+Open **http://localhost:4317** or the printed **http://127.0.0.1:4317** URL. Keep the terminal running; Ctrl+C stops it. Restart with `pnpm start`. `pnpm dev` serves the client with Vite hot reload. Set `PORT` to choose another port.
 
 The server uses your existing pi authentication and configuration, and pi owns session persistence in its normal agent directory. Browser local storage holds recent project paths. No credentials or session copies belong in this repository. The process binds loopback and validates Host/Origin; RPC and SSE require a same-origin, HttpOnly session cookie. Pi tools run with the server process’s permissions.
 
@@ -29,12 +29,12 @@ After a server restart, reconnect and open/resume the saved conversation. Loadin
 ## Verification
 
 ```sh
-npm run check
-npm test
-npm run build
+pnpm check
+pnpm test
+pnpm build
 ```
 
-See [acceptance evidence](docs/acceptance.md) for live-provider and browser checks. `npx tsx scripts/smoke.ts` is an **explicit real-provider test**: it creates temporary settings, trust, skills and sessions, uses existing authentication, and performs model/tool turns. It does not modify your global settings. The other `scripts/browser-*` and test-server helpers are manual acceptance tooling, not app startup requirements.
+See [acceptance evidence](docs/acceptance.md) for live-provider and browser checks. `pnpm exec tsx scripts/smoke.ts` is an **explicit real-provider test**: it creates temporary settings, trust, skills and sessions, uses existing authentication, and performs model/tool turns. It does not modify your global settings. The other `scripts/browser-*` and test-server helpers are manual acceptance tooling, not app startup requirements.
 
 ## Current limits
 

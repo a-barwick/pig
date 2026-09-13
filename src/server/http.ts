@@ -15,13 +15,17 @@ export function authorized(req: IncomingMessage, origin: string, token: string) 
 }
 export async function serve(runtime: RuntimeService, config: ConfigService, port = 4317, production = false) {
  const origin=`http://127.0.0.1:${port}`;
+ const localhostOrigin=`http://localhost:${port}`;
+ const loopbackHost=new URL(origin).host;
+ const localhostHost=new URL(localhostOrigin).host;
  const token=randomBytes(32).toString('hex');
  const vite=production?null:await (await import('vite')).createServer({server:{middlewareMode:true},appType:'spa'});
  const server=createServer(async(req,res)=>{
   const path=new URL(req.url??'/',origin).pathname;
-  if(req.headers.host!==new URL(origin).host || (req.headers.origin && req.headers.origin!==origin) || req.headers['sec-fetch-site']==='cross-site'){res.writeHead(403);res.end('Local access only');return;}
+  const requestOrigin=req.headers.host===localhostHost?localhostOrigin:origin;
+  if((req.headers.host!==loopbackHost && req.headers.host!==localhostHost) || (req.headers.origin && req.headers.origin!==requestOrigin) || req.headers['sec-fetch-site']==='cross-site'){res.writeHead(403);res.end('Local access only');return;}
   if(path.startsWith('/trpc/')){
-   if(!authorized(req,origin,token)){res.writeHead(401);res.end('Open the workspace page first.');return;}
+   if(!authorized(req,requestOrigin,token)){res.writeHead(401);res.end('Open the workspace page first.');return;}
    await nodeHTTPRequestHandler({req,res,path:path.slice(6),router:appRouter,createContext:()=>({runtime,config})});return;
   }
   if(req.method!=='GET' && req.method!=='HEAD'){res.writeHead(405);res.end();return;}

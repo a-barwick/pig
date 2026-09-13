@@ -10,4 +10,4 @@ Streaming contract: events sends complete authoritative snapshots on meaningful 
 
 Skill resourceId is its canonical absolute SKILL.md path, constrained by config service to discovered/allowed resources. Revision is SHA256 of bytes. ExpectedRevision null means create only. Trial must verify revision and actual loaded resource, start fresh session, and explicitly invoke /skill:name with the provided prompt. It must not bypass trust.
 
-Run npm run check, npm test, npm run build. Lead owns installing packages. pi pinned 0.85.1; inspect node_modules/@earendil-works/pi-coding-agent/docs/sdk.md and declarations for installed behavior. Never print credentials or copy global settings/sessions into checkout. Do not modify live config in smoke tests; use temporary agent dirs for destructive cases.
+Run pnpm check, pnpm test, pnpm build. Lead owns installing packages. pi pinned 0.85.1; inspect node_modules/@earendil-works/pi-coding-agent/docs/sdk.md and declarations for installed behavior. Never print credentials or copy global settings/sessions into checkout. Do not modify live config in smoke tests; use temporary agent dirs for destructive cases.

@@ -4,6 +4,8 @@ The integrated app uses Svelte/TypeScript, the local Node server, typed tRPC HTT
 
 ## Automated checks
 
+After the pnpm switch and localhost fix, `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test` (35 tests), and `pnpm build` passed. A production server returned HTTP 200 for both `localhost` and `127.0.0.1` on loopback. The original first-slice checks below remain historical evidence.
+
 - `npm run check`: zero errors and zero warnings.
 - `npm test`: 34 tests passed across config preservation/conflicts, runtime lifecycle/trust/dialogs/redaction, tool result presentation, and HTTP/SSE access boundaries.
 - `npm run build`: production Svelte bundle built successfully.

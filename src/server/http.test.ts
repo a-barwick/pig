@@ -9,8 +9,14 @@ beforeAll(async()=>{app=await serve(runtime,{} as ConfigService,14317,true);cons
 afterAll(async()=>{app.server.closeAllConnections();await app.close();});
 describe('loopback RPC and SSE boundary',()=>{
  it('requires local session cookie',async()=>{expect((await fetch(app.origin+'/trpc/state')).status).toBe(401);});
+ it('accepts localhost with a matching origin',async()=>{
+  for(const path of ['/', '/trpc/state']) {
+   const status=await new Promise<number>(resolve=>{const req=request(app.origin+path,{headers:{host:'localhost:14317',origin:'http://localhost:14317',cookie}},res=>{res.resume();resolve(res.statusCode!);});req.end();});
+   expect(status).toBe(200);
+  }
+ });
  it('rejects foreign origins, hosts and cross-site requests',async()=>{
- for(const headers of [{cookie,origin:'https://evil.example'},{cookie,host:'evil.example:14317'},{cookie,'sec-fetch-site':'cross-site'}]) expect(await new Promise<number>(resolve=>{const req=request(app.origin+'/trpc/state',{headers},res=>{res.resume();resolve(res.statusCode!);});req.end();})).toBe(403);
+ for(const headers of [{cookie,origin:'https://evil.example'},{cookie,host:'evil.example:14317'},{cookie,host:'localhost:14317',origin:'http://127.0.0.1:14317'},{cookie,'sec-fetch-site':'cross-site'}]) expect(await new Promise<number>(resolve=>{const req=request(app.origin+'/trpc/state',{headers},res=>{res.resume();resolve(res.statusCode!);});req.end();})).toBe(403);
  });
  it('serves typed RPC to the local page',async()=>{const r=await fetch(app.origin+'/trpc/state',{headers:{cookie}});expect(r.status).toBe(200);expect(await r.json()).toEqual({result:{data:null}});});
  it('delivers subscription events over SSE and closes on abort',async()=>{
