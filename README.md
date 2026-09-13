@@ -36,10 +36,9 @@ After a server restart, reconnect and open/resume the saved conversation. Loadin
 pnpm check
 pnpm test
 pnpm build
-pnpm exec tsx scripts/kit-boundary-check.ts
 ```
 
-See [acceptance evidence](docs/acceptance.md) for live-provider and browser checks. `pnpm exec tsx scripts/smoke.ts` is an **explicit real-provider test**: it creates temporary settings, trust, skills and sessions, uses existing authentication, and performs model/tool turns. It does not modify your global settings. The other `scripts/browser-*` and test-server helpers are manual acceptance tooling, not app startup requirements.
+These checks cover types, unit behavior, and the production build. Dogfood the running app for conversation, skill, and reconnect behavior.
 
 ## Svelte AI authoring tools
 
@@ -53,4 +52,4 @@ Codex loads the official Svelte MCP server from [the project configuration](.cod
 - Undo retains the last save per file only until server restart. Settings saves preserve unknown values but normalize JSON formatting. Revision checks detect outside changes; a simultaneous noncooperating filesystem writer can still race the final rename.
 - Raw evidence masks recognized credential fields/patterns with `[REDACTED]`. Missing tool outcomes are unknown; a cancellation request is not proof that every side effect was undone.
 
-The bounded release follows [the handoff](docs/implementation-handoff.md) and [visual reference](design/pi-personal-workspace.html). Reference inventories and [deferred ideas](docs/future.md) do not expand the release scope. No hosted deployment or package installation UI is included.
+[Configuration references](docs/pi-configuration.md) and [deferred ideas](docs/future.md) describe possibilities, not additional release scope. No hosted deployment or package installation UI is included.

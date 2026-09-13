@@ -1,6 +1,6 @@
 # Deferred ideas
 
-These are saved possibilities, not implementation scope. The current slice is defined in [the handoff](implementation-handoff.md).
+These are saved possibilities, not implementation scope. Follow [the project guidance](../AGENTS.md) and current app behavior for the active slice.
 
 ## Skill evals
 

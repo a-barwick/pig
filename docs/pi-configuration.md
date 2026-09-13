@@ -2,7 +2,7 @@
 
 Baseline: installed `@earendil-works/pi-coding-agent` **0.85.1**, inspected September 12, 2026. The installed package's docs are the version-specific reference; links below point to current upstream and can change.
 
-This is a capability reference. The [implementation handoff](implementation-handoff.md) defines which capabilities belong in the first release.
+This is a capability reference, not a list of features to build. Follow [the project guidance](../AGENTS.md) for current scope.
 
 ## Configuration surfaces
 
