@@ -1,6 +1,6 @@
 # Deferred ideas
 
-These are saved possibilities, not implementation scope. Follow [the project guidance](../AGENTS.md) and current app behavior for the active slice.
+These are saved possibilities, not implementation scope. Follow [the project guidance](../AGENTS.md) for the native app.
 
 ## Skill evals
 
