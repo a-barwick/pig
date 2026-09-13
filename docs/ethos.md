@@ -29,7 +29,7 @@ For any new screen or control, ask: Does it help Austin converse with Pi now, un
 
 ## Boundaries
 
-This document sets a product direction, not an implementation backlog. The current local app already has a conversation, a harness inspector, skill editing and fresh trials. Dogfood that loop before turning session branching, package installation, multi-agent controls, or broad configuration into commitments. Keep the loopback browser boundary, redaction, explicit project trust and session resume, and Pi's native persistence.
+This document sets a product direction, not an implementation backlog. The former web app has been removed; there is no runnable replacement yet. Build a native macOS experience, not a web wrapper. Keep redaction, explicit project trust and session resume, and Pi's native persistence. Session branching, package installation, multi-agent controls, and broad configuration are not commitments.
 
 ## Sources
 
@@ -39,4 +39,4 @@ This document sets a product direction, not an implementation backlog. The curre
 - [User account: Pi as a workshop](https://www.coraliedelpha.fr/blog/pi-coding-agent-harness/) and [user account: owning a workflow](https://jayshah.dev/posts/stop-renting-your-workflow/) — firsthand reports, not a representative survey.
 - [New-user criticism](https://github.com/earendil-works/pi/discussions/3735) — configuration and extension discovery can be hard; the GUI should clarify them without hiding their source.
 
-Pi's published documentation may describe a newer release than the dashboard's pinned SDK. Verify behavior against the installed version before implementing a concept.
+Pi's published documentation may describe a newer release than the 0.85.1 configuration research snapshot. Verify behavior against the version actually used by the native app.
