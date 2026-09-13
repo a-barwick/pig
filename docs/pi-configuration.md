@@ -4,10 +4,6 @@ Baseline: installed `@earendil-works/pi-coding-agent` **0.85.1**, inspected Sept
 
 This is a capability reference. The [implementation handoff](implementation-handoff.md) defines which capabilities belong in the first release.
 
-## Current local starting point
-
-Pi is installed through Node 22.23.2. Selected non-secret defaults are `openai-codex` / `gpt-5.6-sol`, thinking `high`, theme `dark`. The settings file also contains a per-model thinking map and changelog bookkeeping. A global skills directory exists. This was a narrow read of configuration metadata, not a skills audit. Credentials and session contents were not read or copied.
-
 ## Configuration surfaces
 
 | Surface                      | Where pi reads it                                                                                                                      | What the GUI could change                                                                                                                |

@@ -1,6 +1,6 @@
 # Personal pi workspace — implementation handoff
 
-Status: local SvelteKit dogfood slice implemented. See [acceptance.md](acceptance.md) for verification and [sveltekit-migration-plan.md](sveltekit-migration-plan.md) for the migration decisions and gate evidence.
+Status: local SvelteKit dogfood slice implemented. See [acceptance.md](acceptance.md) for verification.
 
 ## Product and scope
 

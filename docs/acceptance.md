@@ -2,7 +2,7 @@
 
 ## SvelteKit migration — current verification
 
-The workspace now runs through SvelteKit 2.70.3, Svelte 5.57.0, Vite 8.3.0, and adapter-node 5.5.7. Pi remains pinned to 0.85.1. The starting branch was clean at `7466860`; its 47-test baseline passed before migration. The final app has one Kit listener and one tRPC Fetch SSE feed at `/trpc/events`, with SSR enabled. See [the migration execution record](sveltekit-migration-plan.md).
+The workspace now runs through SvelteKit 2.70.3, Svelte 5.57.0, Vite 8.3.0, and adapter-node 5.5.7. Pi remains pinned to 0.85.1. The starting branch was clean at `7466860`; its 47-test baseline passed before migration. The final app has one Kit listener and one tRPC Fetch SSE feed at `/trpc/events`, with SSR enabled.
 
 | Check | Current evidence |
 | --- | --- |
@@ -23,40 +23,6 @@ Fresh host-permission rerun on September 12: `pnpm build`, the dev/built Kit bou
 The shell initially could not launch Chrome or expose authenticated models inside its sandbox. Repeating those authorized checks with normal host permissions passed; no required provider/browser check remains blocked. This is local implementation and acceptance evidence, not Austin's own dogfood feedback or a hosted deployment.
 
 Reproduce with `pnpm exec tsx scripts/smoke.ts`, then use its printed temporary root with `pnpm exec tsx scripts/browser-flow.ts <root>`. Run `pnpm exec tsx scripts/browser-recovery.ts <root>` against a separate temporary root whose isolated `agent/settings.json` sets `defaultProjectTrust` to `"always"`; this lets the test extension load and avoids prior smoke steering instructions. The browser helpers launch the actual Kit Node build on isolated test ports. Local screenshots are in `/tmp/pi-dashboard-browser/`; temporary test roots are not fixtures or session exports in the repository.
-
-## Historical first-slice evidence
-
-The record below preserves first-slice evidence from before the Kit migration. Test counts are historical; the command examples use current pnpm equivalents. Use the Kit verification above and the current README for the running app.
-
-The first slice combined Svelte/TypeScript, typed tRPC HTTP calls and an SSE subscription, and `@earendil-works/pi-coding-agent` pinned to 0.85.1. The main implementation ran in visible Herdr agents `pi-runtime`, `pi-ui`, and `pi-workbench`; the lead owned contracts, dependencies, integration and final verification.
-
-## Automated checks
-
-After the pnpm switch and localhost fix, `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test` (35 tests), and `pnpm build` passed. The production endpoint returned HTTP 200 for both `localhost` and `127.0.0.1` on loopback. The first-slice checks below remain historical evidence.
-
-- `pnpm check`: zero errors and zero warnings.
-- `pnpm test`: 34 tests passed across config preservation/conflicts, runtime lifecycle/trust/dialogs/redaction, tool result presentation, and HTTP/SSE access boundaries.
-- `pnpm build`: production app built successfully.
-- Production dependency audit: zero reported vulnerabilities at installation time.
-
-## Real acceptance evidence
-
-| Handoff check                 | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Real conversation and tools   | Existing authenticated `openai-codex/gpt-5.6-sol` streamed a real response. The live smoke performed separate successful and failed bash calls, retaining actual arguments, outputs and distinct IDs.                                                                                                                                                                                                                                      |
-| Stop, steer and resume        | A running `sleep 30` tool was stopped with a steering message accepted, both through the service and through the actual browser controls. The session returned idle. The same saved history resumed without tool execution after replacing the runtime, and the browser resumed it after an actual server process restart.                                                                                                                 |
-| Create, edit and invoke skill | Browser created `SKILL.md`, reviewed a real diff, saved, edited and invoked a new revision. The model returned `BROWSER_REVISION_OK`. Separate final smoke invoked saved revision `fc18ef4fc06291a085cb9e85aba63ed62288cb6b75bef8251556949e468629ce`; pi's expanded skill block was observed in the actual user message and the model returned `SKILL_REVISION_TWO`. Loading evidence is not a general assertion of instruction-following. |
-| Scoped defaults               | With isolated global High and no per-model override, a project Medium override appeared in a fresh session. Removing it restored High. Global bytes remained identical. Tests also cover per-model precedence, partial provider/model defaults, and unknown-field preservation.                                                                                                                                                            |
-| Trust                         | An undecided project using `ask` exposed skipped project resources and the reason. Explicit trust in the temporary agent directory loaded its skill in a fresh session. No trust decision was added to Austin's real agent directory by acceptance tests.                                                                                                                                                                                  |
-| Conflicts and recovery        | Actual outside edits caused save conflicts and preserved the browser draft. Reload/review/save recovered and produced the invoked revision. Tests cover undo, invalid JSON, stale revisions, and symlink boundaries.                                                                                                                                                                                                                       |
-| Browser experience            | Actual Chrome inspected at 1440×1000 and 760×900: empty state, populated conversation, live running tool/steer/stop, tool/schema inspection, editor/diff, saved trial, settings, persistent error, disconnect/reconnect, and a real extension input dialog. Half-window checks found no horizontal overflow. Standard dialog response returned the runtime to idle. No browser JavaScript errors in the completed recovery run.            |
-| Configuration preservation    | Live runs used temporary settings/trust/session directories and injected the existing authenticated model runtime. Austin's actual global settings compared byte-for-byte equal before/after. Auth was used through pi and never copied into the checkout.                                                                                                                                                                                 |
-
-Local evidence is in `/tmp/pi-dashboard-smoke-final.log`, `/tmp/pi-dashboard-recovery.log`, and `/tmp/pi-dashboard-browser/` screenshots. These are local acceptance artifacts, not production fixtures or repository session exports. `scripts/smoke.ts` reruns the live-provider path explicitly. Browser helper scripts require a temporary acceptance project and the documented test-server helper.
-
-## Integration fixes verified
-
-Startup hooks now report running until ready and can surface dialogs without blocking the browser. Resume comparisons canonicalize macOS path aliases. Missing recorded tool outcomes are unknown, not perpetually running. Cancellation requests remain distinct from tool outcomes. Reconnect renews the local session cookie after restart, keeps drafts/history readable, and requires opening/resuming an active session before sending. Failed project-open errors survive the automatic reconnect. Session titles and inspectors have bounded scrolling so expanded skill text does not consume the workspace.
 
 ## Intentional limits
 
